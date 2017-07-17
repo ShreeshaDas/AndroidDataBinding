@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Data Binding</string>
-    <string name="default_error_message">Unable to featch media information</string>
+    <string name="default_error_message">Unable to fetch media information</string>
+    <string name="default_people_error_message">Unable to fetch media information</string>
     <string name="error_loading_people">There seems to have been some error.</string>
     <string name="loading">Loading Data</string>
+    <string name="movie">movie</string>
+    <string name="tv">tv</string>
+    <string name="person">person</string>
 
     <string-array name="category">
         <item>Top rated movies,top_rated,movie</item>
@@ -12,7 +16,7 @@
         <item>Popular TV shows,popular,tv</item>
         <item>Top rated TV shows,top_rated,tv</item>
         <item>On the air TV shows,on_the_air,tv</item>
-        <item>Airing today TV shows, airing_today,tv</item>
+        <item>Airing today TV shows,airing_today,tv</item>
         <item>Popular people,popular,person</item>
     </string-array>
 </resources>

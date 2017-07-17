@@ -5,10 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.MovieTitleLayoutBinding;
-import com.android.androiddatabinding.model.MovieCategory;
 import com.android.androiddatabinding.viewmodel.MovieTitleViewModel;
-
-import java.util.ArrayList;
 
 /**
  * Created by shreesha on 10/7/17.

@@ -13,8 +13,7 @@ import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.TvFetcher;
 import com.android.androiddatabinding.internal.Constants;
-import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.model.MovieCategory;
+import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.NetworkError;
 import com.android.androiddatabinding.model.Tv;
 import com.android.androiddatabinding.model.Tvs;
@@ -41,14 +40,14 @@ public class TvShowsViewModel extends BaseViewModel {
 
     private static final String TAG = TvShowsViewModel.class.getSimpleName();
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-    private MovieCategory mMovieCategory;
+    private MediaCategory mMediaCategory;
     private Context mContext;
     public ObservableField<String> errorMessageLabel;
     public ObservableInt errorLabel;
     public ObservableInt mediaRecyclerView;
 
-    public TvShowsViewModel(Context context, MovieCategory movieCategory) {
-        this.mMovieCategory = movieCategory;
+    public TvShowsViewModel(Context context, MediaCategory mediaCategory) {
+        this.mMediaCategory = mediaCategory;
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
@@ -63,31 +62,35 @@ public class TvShowsViewModel extends BaseViewModel {
     }
 
     public String getCategoryTitle() {
-        return mMovieCategory.getMediaCategory();
+        return mMediaCategory.getMediaCategory();
     }
 
     public ArrayList<Tvs> getTvShows() {
-        return mMovieCategory.getTvShows();
+        return mMediaCategory.getTvShows();
     }
 
     public String getMediaType() {
-        return mMovieCategory.getMediaType();
+        return mMediaCategory.getMediaType();
     }
 
     public String getQueryType() {
-        return mMovieCategory.getQueryType();
+        return mMediaCategory.getQueryType();
     }
 
     public void getItemList(Context context, TvShowsViewModel tvShowsViewModel) {
-        if (tvShowsViewModel.getTvShows() != null && tvShowsViewModel.getTvShows().size() == 0) {
-            if (mMovieCategory.getNetworkError() != null) {
-                showError();
-            } else {
-                Log.d(TAG, tvShowsViewModel.getCategoryTitle() + " " + tvShowsViewModel.getQueryType());
-                this.getTvShows(context, tvShowsViewModel.getQueryType(), tvShowsViewModel.getMediaType());
-            }
+        if (tvShowsViewModel.getTvShows() == null) {
+            getTvShows(context, tvShowsViewModel.getQueryType(), tvShowsViewModel.getMediaType());
         } else {
-            setMedia(tvShowsViewModel.getTvShows());
+            if (tvShowsViewModel.getTvShows() != null && tvShowsViewModel.getTvShows().size() == 0) {
+                if (mMediaCategory.getNetworkError() != null) {
+                    showError();
+                } else {
+                    Log.d(TAG, tvShowsViewModel.getCategoryTitle() + " " + tvShowsViewModel.getQueryType());
+                    getTvShows(context, tvShowsViewModel.getQueryType(), tvShowsViewModel.getMediaType());
+                }
+            } else {
+                setMedia(tvShowsViewModel.getTvShows());
+            }
         }
     }
 
@@ -99,7 +102,7 @@ public class TvShowsViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
-        RxBus.getInstance().send(mMovieCategory);
+        RxBus.getInstance().send(mMediaCategory);
     }
 
     public void getTvShows(Context context, String type, String mediaType) {
@@ -109,8 +112,8 @@ public class TvShowsViewModel extends BaseViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Tv>() {
                     @Override
-                    public void accept(Tv moviesResponse) throws Exception {
-                        updateTvShowsList(moviesResponse);
+                    public void accept(Tv tvResponse) throws Exception {
+                        updateTvShowsList(tvResponse);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -131,11 +134,11 @@ public class TvShowsViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
-        RxBus.getInstance().send(mMovieCategory);
+        RxBus.getInstance().send(mMediaCategory);
     }
 
     private void setTvShows(ArrayList<Tvs> tvShows) {
-        this.mMovieCategory.setTv(tvShows);
+        this.mMediaCategory.setTv(tvShows);
     }
 
     private void handelGetMoviesErrorCase(Throwable throwable) {
@@ -158,7 +161,7 @@ public class TvShowsViewModel extends BaseViewModel {
         } else if (throwable instanceof SocketTimeoutException) {
             error.setErrorType(NetworkError.TIMEOUT_EXCEPTION);
         }
-        mMovieCategory.setNetworkError(error);
+        mMediaCategory.setNetworkError(error);
         showError();
     }
 
@@ -166,7 +169,7 @@ public class TvShowsViewModel extends BaseViewModel {
         errorLabel.set(View.VISIBLE);
         mediaRecyclerView.set(View.GONE);
         errorMessageLabel.set(mContext.getString(R.string.error_loading_people));
-        //RxBus.getInstance().send(mMovieCategory);
+        //RxBus.getInstance().send(mMediaCategory);
     }
 
     public void subscribe() {

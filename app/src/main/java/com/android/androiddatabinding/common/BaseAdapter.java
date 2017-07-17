@@ -1,7 +1,13 @@
 package com.android.androiddatabinding.common;
 
+import android.databinding.BindingAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.android.androiddatabinding.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
@@ -14,12 +20,15 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
 
     public static final int HEADER = 0;
     public static final int MOVIE_TITLE = 1;
-    public static final int MOVIE = 2;
+    public static final int MOVIE_LIST = 2;
     public static final int TV_TITLE = 3;
-    public static final int TV = 4;
+    public static final int TV_LIST = 4;
     public static final int PEOPLE_TITLE = 5;
-    public static final int PEOPLE = 6;
+    public static final int PEOPLE_LIST = 6;
     public static final int FOOTER = 7;
+    public static final int MOVIE = 8;
+    public static final int TV = 9;
+    public static final int PEOPLE = 10;
 
     public enum FooterType {
         LOAD_MORE,
@@ -62,10 +71,13 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
                 viewHolder = createHeaderViewHolder(parent);
                 break;
             case MOVIE_TITLE:
-            case MOVIE:
+            case MOVIE_LIST:
             case TV_TITLE:
-            case TV:
+            case TV_LIST:
             case PEOPLE_TITLE:
+            case PEOPLE_LIST:
+            case MOVIE:
+            case TV:
             case PEOPLE:
                 viewHolder = createItemViewHolder(parent, viewType);
                 break;
@@ -86,12 +98,15 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
                 bindHeaderViewHolder(viewHolder);
                 break;
             case MOVIE_TITLE:
-            case MOVIE:
+            case MOVIE_LIST:
             case TV_TITLE:
-            case TV:
+            case TV_LIST:
             case PEOPLE_TITLE:
+            case PEOPLE_LIST:
+            case MOVIE:
+            case TV:
             case PEOPLE:
-                bindItemViewHolder((BaseViewHolder)viewHolder, position);
+                bindItemViewHolder((BaseViewHolder) viewHolder, position);
                 break;
             case FOOTER:
                 bindFooterViewHolder(viewHolder);

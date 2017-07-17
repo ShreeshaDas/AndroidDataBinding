@@ -11,8 +11,8 @@ import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
+import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.model.MovieCategory;
 import com.android.androiddatabinding.viewmodel.MovieListViewModel;
 
 import java.util.ArrayList;
@@ -60,11 +60,15 @@ public class MovieListViewHolder extends BaseViewHolder {
         mMediaCategory = movieListViewModel.getCategoryTitle();
         mMovieListLayoutBinding.setMovielist(movieListViewModel);
         initAdapter();
+        handelScrollPosition(position);
+        movieListViewModel.getItemList(mContext, (MovieListViewModel) baseViewModel);
+    }
+
+    private void handelScrollPosition(int position) {
         int lastSeenFirstPosition = listPosition.get(position, 0);
         if (lastSeenFirstPosition >= 0) {
             mMovieListLayoutBinding.movieList.scrollToPosition(lastSeenFirstPosition);
         }
-        movieListViewModel.getItemList(mContext, (MovieListViewModel) baseViewModel);
     }
 
     @Override
@@ -88,8 +92,8 @@ public class MovieListViewHolder extends BaseViewHolder {
                 .subscribe(new Consumer<Object>() {
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
-                        if (o instanceof MovieCategory) {
-                            updateMovieAdapter((MovieCategory) o);
+                        if (o instanceof MediaCategory) {
+                            updateMovieAdapter((MediaCategory) o);
                         } else if (o instanceof Events) {
                             Events busEvent = (Events) o;
                             if (busEvent == Events.RECYCLER_VIEW_DETACHED) {
@@ -101,10 +105,10 @@ public class MovieListViewHolder extends BaseViewHolder {
         mCompositeDisposable.add(disposable);
     }
 
-    private void updateMovieAdapter(MovieCategory movieCategory) {
-        if (movieCategory != null && movieCategory.getMovies() != null && movieCategory.getMovies().size() > 0) {
-            if (mMediaCategory.equals(movieCategory.getMediaCategory())) {
-                mMoviesAdapter.setData(movieCategory.getMovies());
+    private void updateMovieAdapter(MediaCategory mediaCategory) {
+        if (mediaCategory != null && mediaCategory.getMovies() != null && mediaCategory.getMovies().size() > 0) {
+            if (mMediaCategory.equals(mediaCategory.getMediaCategory())) {
+                mMoviesAdapter.addAll(mediaCategory.getMovies());
             }
         }
     }

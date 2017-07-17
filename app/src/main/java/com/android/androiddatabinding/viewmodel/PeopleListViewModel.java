@@ -11,12 +11,12 @@ import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
-import com.android.androiddatabinding.data.fetcher.MoviesFetcher;
+import com.android.androiddatabinding.data.fetcher.PeopleFetcher;
 import com.android.androiddatabinding.internal.Constants;
 import com.android.androiddatabinding.model.MediaCategory;
-import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.model.MoviesResponse;
 import com.android.androiddatabinding.model.NetworkError;
+import com.android.androiddatabinding.model.People;
+import com.android.androiddatabinding.model.PeopleList;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -36,9 +36,9 @@ import retrofit2.HttpException;
  * Created by shreesha on 12/7/17.
  */
 
-public class MovieListViewModel extends BaseViewModel {
+public class PeopleListViewModel extends BaseViewModel {
 
-    private static final String TAG = MovieListViewModel.class.getSimpleName();
+    private static final String TAG = PeopleListViewModel.class.getSimpleName();
 
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private MediaCategory mMediaCategory;
@@ -47,9 +47,9 @@ public class MovieListViewModel extends BaseViewModel {
     public ObservableInt errorLabel;
     public ObservableInt mediaRecyclerView;
 
-    public MovieListViewModel(Context context, MediaCategory mediaCategory) {
+    public PeopleListViewModel(Context context, MediaCategory mediaCategory) {
         this.mMediaCategory = mediaCategory;
-        errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
+        errorMessageLabel = new ObservableField<>(context.getString(R.string.default_people_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
         mContext = context;
@@ -66,12 +66,12 @@ public class MovieListViewModel extends BaseViewModel {
         return mMediaCategory.getMediaCategory();
     }
 
-    public ArrayList<Movie> getMovies() {
-        return mMediaCategory.getMovies();
+    public ArrayList<PeopleList> getPeople() {
+        return mMediaCategory.getPeople();
     }
 
-    public void setMovies(ArrayList<Movie> movies) {
-        this.mMediaCategory.setMovies(movies);
+    public void setPeople(ArrayList<PeopleList> peopleLists) {
+        this.mMediaCategory.setPeople(peopleLists);
     }
 
     public String getMediaType() {
@@ -83,37 +83,36 @@ public class MovieListViewModel extends BaseViewModel {
     }
 
 
-    public void getItemList(Context context, MovieListViewModel movieListViewModel) {
-        if (movieListViewModel.getMovies() == null) {
-            getMovies(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
+    public void getItemList(Context context, PeopleListViewModel movieListViewModel) {
+        if(movieListViewModel.getPeople() == null) {
+            getPeople(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
         } else {
-            if (movieListViewModel.getMovies() != null && movieListViewModel.getMovies().size() == 0) {
-                if (mMediaCategory.getNetworkError() != null) {
-                    showError();
-                } else {
-                    Log.d(TAG, movieListViewModel.getCategoryTitle() + " " + movieListViewModel.getQueryType());
-                    getMovies(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
-                }
+        if (movieListViewModel.getPeople() != null && movieListViewModel.getPeople().size() == 0) {
+            if (mMediaCategory.getNetworkError() != null) {
+                showError();
             } else {
-                setMedia(movieListViewModel.getMovies());
+                Log.d(TAG, movieListViewModel.getCategoryTitle() + " " + movieListViewModel.getQueryType());
+                getPeople(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
             }
-        }
+        } else {
+            setPeopleList(movieListViewModel.getPeople());
+        }}
     }
 
-    private void setMedia(ArrayList<Movie> movies) {
-        updateData(movies);
+    private void setPeopleList(ArrayList<PeopleList> peopleList) {
+        updateData(peopleList);
     }
 
 
-    private void getMovies(Context context, String type, String mediaType) {
+    private void getPeople(Context context, String type, String mediaType) {
         AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(context);
-        Disposable disposable = new MoviesFetcher().getMoviesList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
+        Disposable disposable = new PeopleFetcher().getPeopleList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<MoviesResponse>() {
+                .subscribe(new Consumer<People>() {
                     @Override
-                    public void accept(MoviesResponse moviesResponse) throws Exception {
-                        updateMovieList(moviesResponse);
+                    public void accept(People people) throws Exception {
+                        updatePeopleList(people);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -149,9 +148,9 @@ public class MovieListViewModel extends BaseViewModel {
         showError();
     }
 
-    private void updateMovieList(MoviesResponse moviesResponse) {
-        if (moviesResponse != null && moviesResponse.getResults() != null && moviesResponse.getResults().size() > 0) {
-            updateData(moviesResponse.getResults());
+    private void updatePeopleList(People people) {
+        if (people != null && people.getResults() != null && people.getResults().size() > 0) {
+            updateData(people.getResults());
         }
     }
 
@@ -162,10 +161,10 @@ public class MovieListViewModel extends BaseViewModel {
         //RxBus.getInstance().send(mMediaCategory);
     }
 
-    private void updateData(ArrayList<Movie> movies) {
+    private void updateData(ArrayList<PeopleList> people) {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
-        setMovies(movies);
+        setPeople(people);
         RxBus.getInstance().send(mMediaCategory);
     }
 

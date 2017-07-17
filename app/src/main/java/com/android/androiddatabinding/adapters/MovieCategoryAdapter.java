@@ -11,13 +11,18 @@ import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
+import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
 import com.android.androiddatabinding.databinding.MovieTitleLayoutBinding;
+import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
 import com.android.androiddatabinding.databinding.TvShowsListLayoutBinding;
-import com.android.androiddatabinding.model.MovieCategory;
+import com.android.androiddatabinding.model.MediaCategory;
+import com.android.androiddatabinding.viewholder.MovieListViewHolder;
 import com.android.androiddatabinding.viewholder.MovieTitleViewHolder;
+import com.android.androiddatabinding.viewholder.PeopleListViewHolder;
 import com.android.androiddatabinding.viewholder.TvShowsListViewHolder;
 import com.android.androiddatabinding.viewmodel.MovieListViewModel;
 import com.android.androiddatabinding.viewmodel.MovieTitleViewModel;
+import com.android.androiddatabinding.viewmodel.PeopleListViewModel;
 import com.android.androiddatabinding.viewmodel.TvShowsViewModel;
 
 import java.util.List;
@@ -29,11 +34,11 @@ import java.util.List;
 //https://medium.com/google-developers/android-data-binding-recyclerview-db7c40d9f0e4
 //https://medium.com/@etiennelawlor/pagination-with-recyclerview-1cb7e66a502b
 
-public class MovieCategoryAdapter extends BaseAdapter<MovieCategory> {
+public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
 
     private Context mContext;
 
-    public MovieCategoryAdapter(Context context, List<MovieCategory> items) {
+    public MovieCategoryAdapter(Context context, List<MediaCategory> items) {
         super(items);
         this.mContext = context;
     }
@@ -55,16 +60,27 @@ public class MovieCategoryAdapter extends BaseAdapter<MovieCategory> {
                         parent,
                         false);
                 return new MovieTitleViewHolder(movieTitleLayoutBinding);
-            case MOVIE:
-            case TV:
+            case MOVIE_LIST:
+                MovieListLayoutBinding movieListLayoutBinding = DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.getContext()),
+                        R.layout.movie_list_layout,
+                        parent,
+                        false);
+                return new MovieListViewHolder(movieListLayoutBinding);
+            case TV_LIST:
                 TvShowsListLayoutBinding tvShowsListLayoutBinding = DataBindingUtil.inflate(
                         LayoutInflater.from(parent.getContext()),
                         R.layout.tv_shows_list_layout,
                         parent,
                         false);
                 return new TvShowsListViewHolder(tvShowsListLayoutBinding);
-            case PEOPLE:
-                break;
+            case PEOPLE_LIST:
+                PeopleListLayoutBinding peopleListLayoutBinding = DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.getContext()),
+                        R.layout.people_list_layout,
+                        parent,
+                        false);
+                return new PeopleListViewHolder(peopleListLayoutBinding);
         }
         return null;
     }
@@ -76,22 +92,24 @@ public class MovieCategoryAdapter extends BaseAdapter<MovieCategory> {
 
     @Override
     protected void bindHeaderViewHolder(RecyclerView.ViewHolder viewHolder) {
-
     }
 
     @Override
     protected void bindItemViewHolder(BaseViewHolder viewHolder, int position) {
         switch (getItemViewType(position)) {
             case MOVIE_TITLE:
+            case TV_TITLE:
+            case PEOPLE_TITLE:
                 viewHolder.onBind(viewHolder, new MovieTitleViewModel(getItem(position).getMediaCategory()), position);
                 break;
-            case MOVIE:
+            case MOVIE_LIST:
                 viewHolder.onBind(viewHolder, new MovieListViewModel(mContext, getItem(position)), position);
                 break;
-            case TV:
+            case TV_LIST:
                 viewHolder.onBind(viewHolder, new TvShowsViewModel(mContext, getItem(position)), position);
                 break;
-            case PEOPLE:
+            case PEOPLE_LIST:
+                viewHolder.onBind(viewHolder, new PeopleListViewModel(mContext, getItem(position)), position);
                 break;
         }
     }
@@ -103,28 +121,25 @@ public class MovieCategoryAdapter extends BaseAdapter<MovieCategory> {
 
     @Override
     protected void displayLoadMoreFooter() {
-
     }
 
     @Override
     protected void displayErrorFooter() {
-
     }
 
     @Override
     public void addFooter() {
+    }
 
+    @Override
+    public int getItemViewType(int position) {
+        return getItem(position).getGetViewType();
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         RxBus.getInstance().send(Events.RECYCLER_VIEW_DETACHED);
         super.onDetachedFromRecyclerView(recyclerView);
-    }
-
-    @Override
-    public void onViewRecycled(RecyclerView.ViewHolder viewHolder) {
-
     }
 
 

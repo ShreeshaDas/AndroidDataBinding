@@ -15,15 +15,12 @@ import android.view.MenuItem;
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.adapters.MovieCategoryAdapter;
 import com.android.androiddatabinding.databinding.ActivityMainBinding;
-import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.model.MovieCategory;
+import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
-import io.reactivex.disposables.CompositeDisposable;
 
 public class HomeActivity extends AppCompatActivity implements Observer {
 
@@ -31,7 +28,7 @@ public class HomeActivity extends AppCompatActivity implements Observer {
     private HomeViewModel mHomeViewModel;
     private DrawerLayout mDrawer;
     private MovieCategoryAdapter mMovieCategoryAdapter;
-    ArrayList<MovieCategory> mMovieCategories = new ArrayList<>();
+    ArrayList<MediaCategory> mMovieCategories = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,9 +94,10 @@ public class HomeActivity extends AppCompatActivity implements Observer {
 
 
     private void setUpRecycleView(RecyclerView recycleView) {
-        mMovieCategoryAdapter = new MovieCategoryAdapter(this, createMovieCategoryList());
+        mMovieCategoryAdapter = new MovieCategoryAdapter(this, new ArrayList<MediaCategory>());
         recycleView.setAdapter(mMovieCategoryAdapter);
         recycleView.setLayoutManager(new LinearLayoutManager(this));
+        mMovieCategoryAdapter.addAll(createMovieCategoryList());
     }
 
 
@@ -123,12 +121,21 @@ public class HomeActivity extends AppCompatActivity implements Observer {
     public void update(Observable observable, Object arg) {
     }
 
-    private ArrayList<MovieCategory> createMovieCategoryList() {
+    private ArrayList<MediaCategory> createMovieCategoryList() {
         String[] categoryList = getResources().getStringArray(R.array.category);
         for (int i = 0; i < categoryList.length; i++) {
             String[] data = categoryList[i].split(",");
-            mMovieCategories.add(new MovieCategory(data[0], MovieCategory.MOVIE_TITLE, data[1], data[2]));
-            mMovieCategories.add(new MovieCategory(data[0], MovieCategory.MOVIE_LIST, data[1], data[2]));
+            if (data[2].equals(getString(R.string.movie))) {
+                mMovieCategories.add(new MediaCategory(data[0], MovieCategoryAdapter.MOVIE_TITLE, data[1], data[2]));
+                mMovieCategories.add(new MediaCategory(data[0], MovieCategoryAdapter.MOVIE_LIST, data[1], data[2]));
+            } else if (data[2].equals(getString(R.string.tv))) {
+                mMovieCategories.add(new MediaCategory(data[0], MovieCategoryAdapter.TV_TITLE, data[1], data[2]));
+                mMovieCategories.add(new MediaCategory(data[0], MovieCategoryAdapter.TV_LIST, data[1], data[2]));
+            } else if (data[2].equals(getString(R.string.person))) {
+                mMovieCategories.add(new MediaCategory(data[0], MovieCategoryAdapter.PEOPLE_TITLE, data[1], data[2]));
+                mMovieCategories.add(new MediaCategory(data[0], MovieCategoryAdapter.PEOPLE_LIST, data[1], data[2]));
+            }
+
         }
         return mMovieCategories;
     }

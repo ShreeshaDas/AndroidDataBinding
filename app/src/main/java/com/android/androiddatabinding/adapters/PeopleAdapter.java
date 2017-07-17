@@ -6,16 +6,23 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.view.animation.Transformation;
 import android.widget.ImageView;
 
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.databinding.MovieItemBinding;
+import com.android.androiddatabinding.databinding.PeopleItemBinding;
 import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.viewholder.MovieViewHolder;
-import com.android.androiddatabinding.viewmodel.MovieViewModel;
+import com.android.androiddatabinding.model.PeopleList;
+import com.android.androiddatabinding.viewholder.PeopleListViewHolder;
+import com.android.androiddatabinding.viewholder.PeopleViewHolder;
+import com.android.androiddatabinding.viewmodel.PeopleListViewModel;
+import com.android.androiddatabinding.viewmodel.PeopleViewModel;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
@@ -24,14 +31,14 @@ import java.util.ArrayList;
  * Created by shreesha on 14/2/17.
  */
 
-public class MoviesAdapter extends BaseAdapter<Movie> {
+public class PeopleAdapter extends BaseAdapter<PeopleList> {
 
-    private ArrayList<Movie> mMovies;
+    private ArrayList<PeopleList> peopleList;
     private Context mContext;
 
-    public MoviesAdapter(Context context, ArrayList<Movie> movies) {
-        super(movies);
-        this.mMovies = movies;
+    public PeopleAdapter(Context context, ArrayList<PeopleList> peopleList) {
+        super(peopleList);
+        this.peopleList = peopleList;
         this.mContext = context;
     }
 
@@ -43,13 +50,13 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
     @Override
     protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case MOVIE:
-                MovieItemBinding movieItemBinding = DataBindingUtil.inflate(
+            case PEOPLE:
+                PeopleItemBinding peopleItemBinding = DataBindingUtil.inflate(
                         LayoutInflater.from(parent.getContext()),
-                        R.layout.movie_item,
+                        R.layout.people_item,
                         parent,
                         false);
-                return new MovieViewHolder(movieItemBinding);
+                return new PeopleViewHolder(peopleItemBinding);
         }
         return null;
     }
@@ -65,9 +72,9 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
     }
 
     @Override
-    protected void bindItemViewHolder(BaseViewHolder viewHolder, int position) {
-        if (viewHolder instanceof MovieViewHolder) {
-            viewHolder.onBind(viewHolder, new MovieViewModel(mContext, getItem(position)), position);
+    protected void bindItemViewHolder(BaseViewHolder holder, int position) {
+        if (holder instanceof PeopleViewHolder) {
+            holder.onBind(holder, new PeopleViewModel(mContext, getItem(position)), position);
         }
     }
 
@@ -98,6 +105,6 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     @Override
     public int getItemViewType(int position) {
-        return MOVIE;
+        return PEOPLE;
     }
 }

@@ -5,15 +5,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseIntArray;
 
-import com.android.androiddatabinding.adapters.TvAdapter;
+import com.android.androiddatabinding.adapters.PeopleAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.common.BaseViewModel;
-import com.android.androiddatabinding.databinding.TvShowsListLayoutBinding;
+import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
 import com.android.androiddatabinding.model.MediaCategory;
-import com.android.androiddatabinding.model.Tvs;
-import com.android.androiddatabinding.viewmodel.TvShowsViewModel;
+import com.android.androiddatabinding.model.Movie;
+import com.android.androiddatabinding.model.PeopleList;
+import com.android.androiddatabinding.viewmodel.PeopleListViewModel;
 
 import java.util.ArrayList;
 
@@ -27,47 +28,47 @@ import io.reactivex.functions.Consumer;
  * Created by shreesha on 10/7/17.
  */
 
-public class TvShowsListViewHolder extends BaseViewHolder {
+public class PeopleListViewHolder extends BaseViewHolder {
 
 
-    private static final String TAG = TvShowsListViewHolder.class.getSimpleName();
+    private static final String TAG = PeopleListViewHolder.class.getSimpleName();
 
-    private TvAdapter mTvAdapter;
+    private PeopleAdapter mPeopleAdapter;
     private Context mContext;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private String mMediaCategory;
-    private TvShowsListLayoutBinding mTvShowsListLayoutBinding;
+    private PeopleListLayoutBinding peopleListLayoutBinding;
     private SparseIntArray listPosition = new SparseIntArray();
 
 
-    public TvShowsListViewHolder(TvShowsListLayoutBinding tvShowsListLayoutBinding) {
-        super(tvShowsListLayoutBinding.getRoot());
-        this.mContext = tvShowsListLayoutBinding.getRoot().getContext();
-        this.mTvShowsListLayoutBinding = tvShowsListLayoutBinding;
+    public PeopleListViewHolder(PeopleListLayoutBinding movieListLayoutBinding) {
+        super(movieListLayoutBinding.getRoot());
+        this.mContext = movieListLayoutBinding.getRoot().getContext();
+        this.peopleListLayoutBinding = movieListLayoutBinding;
         subscribe();
     }
 
 
     private void initAdapter() {
-        mTvAdapter = new TvAdapter(mContext, new ArrayList<Tvs>());
-        mTvShowsListLayoutBinding.movieList.setAdapter(mTvAdapter);
-        mTvShowsListLayoutBinding.movieList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+        mPeopleAdapter = new PeopleAdapter(mContext, new ArrayList<PeopleList>());
+        peopleListLayoutBinding.movieList.setAdapter(mPeopleAdapter);
+        peopleListLayoutBinding.movieList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
     }
 
     @Override
     public void onBind(RecyclerView.ViewHolder holder, BaseViewModel baseViewModel, int position) {
-        TvShowsViewModel tvShowsViewModel = (TvShowsViewModel) baseViewModel;
-        mMediaCategory = tvShowsViewModel.getCategoryTitle();
-        mTvShowsListLayoutBinding.setTvShowsList(tvShowsViewModel);
+        PeopleListViewModel peopleListViewModel = (PeopleListViewModel) baseViewModel;
+        mMediaCategory = peopleListViewModel.getCategoryTitle();
+        peopleListLayoutBinding.setPeoplelist(peopleListViewModel);
         initAdapter();
         handelScrollPosition(position);
-        tvShowsViewModel.getItemList(mContext, (TvShowsViewModel) baseViewModel);
+        peopleListViewModel.getItemList(mContext, peopleListViewModel);
     }
 
     private void handelScrollPosition(int position) {
         int lastSeenFirstPosition = listPosition.get(position, 0);
         if (lastSeenFirstPosition >= 0) {
-            mTvShowsListLayoutBinding.movieList.scrollToPosition(lastSeenFirstPosition);
+            peopleListLayoutBinding.movieList.scrollToPosition(lastSeenFirstPosition);
         }
     }
 
@@ -79,8 +80,8 @@ public class TvShowsListViewHolder extends BaseViewHolder {
     @Override
     public void onViewRecycled(RecyclerView.ViewHolder viewHolder) {
         final int position = viewHolder.getAdapterPosition();
-        if (viewHolder instanceof TvShowsListViewHolder) {
-            LinearLayoutManager layoutManager = ((LinearLayoutManager) mTvShowsListLayoutBinding.movieList.getLayoutManager());
+        if (viewHolder instanceof PeopleListViewHolder) {
+            LinearLayoutManager layoutManager = ((LinearLayoutManager) peopleListLayoutBinding.movieList.getLayoutManager());
             int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
             listPosition.put(position, firstVisiblePosition);
         }
@@ -106,9 +107,9 @@ public class TvShowsListViewHolder extends BaseViewHolder {
     }
 
     private void updateMovieAdapter(MediaCategory mediaCategory) {
-        if (mediaCategory != null && mediaCategory.getTvShows() != null && mediaCategory.getTvShows().size() > 0) {
+        if (mediaCategory != null && mediaCategory.getPeople() != null && mediaCategory.getPeople().size() > 0) {
             if (mMediaCategory.equals(mediaCategory.getMediaCategory())) {
-                mTvAdapter.addAll(mediaCategory.getTvShows());
+                mPeopleAdapter.addAll(mediaCategory.getPeople());
             }
         }
     }

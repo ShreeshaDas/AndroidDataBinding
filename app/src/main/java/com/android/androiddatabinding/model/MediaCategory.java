@@ -6,23 +6,21 @@ import java.util.ArrayList;
  * Created by shreesha on 10/7/17.
  */
 
-public class MovieCategory {
-    public static final int MOVIE_TITLE = 0;
-    public static final int MOVIE_LIST = 1;
+public class MediaCategory {
+
 
     private String mCategoryTitle;
     private ArrayList<Movie> mMovies;
     private ArrayList<Tvs> mTv;
     private ArrayList<PeopleList> mPeople;
     private String mQueryType;
-    private int mType;
     private String mMediaType;
     private NetworkError mNetworkError;
     private int mViewType;
 
-    public MovieCategory(String movieTitle,  int type, String queryType, String mediaType) {
+    public MediaCategory(String movieTitle, int viewType, String queryType, String mediaType) {
         this.mCategoryTitle = movieTitle;
-        this.mType = type;
+        this.mViewType = viewType;
         this.mQueryType = queryType;
         this.mMediaType = mediaType;
     }
@@ -41,14 +39,6 @@ public class MovieCategory {
 
     public void setMovies(ArrayList<Movie> movies) {
         this.mMovies = movies;
-    }
-
-    public int getType() {
-        return mType;
-    }
-
-    public void setType(int type) {
-        this.mType = type;
     }
 
     public String getQueryType() {
@@ -113,7 +103,7 @@ public class MovieCategory {
         if (this == o) return true;
         if (o == null) return false;
         if (getClass() != o.getClass()) return false;
-        MovieCategory media = (MovieCategory) o;
+        MediaCategory media = (MediaCategory) o;
         if (!this.mCategoryTitle.equals(media.getMediaCategory())) return false;
         return true;
     }

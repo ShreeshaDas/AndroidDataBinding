@@ -3,30 +3,29 @@ package com.android.androiddatabinding.viewmodel;
 import android.content.Context;
 
 import com.android.androiddatabinding.common.BaseViewModel;
-import com.android.androiddatabinding.databinding.PeopleItemBinding;
 import com.android.androiddatabinding.databinding.TvItemBinding;
-import com.android.androiddatabinding.model.PeopleList;
+import com.android.androiddatabinding.model.Movie;
 import com.android.androiddatabinding.model.Tvs;
 
 /**
  * Created by shreesha on 17/7/17.
  */
 
-public class PeopleViewModel extends BaseViewModel {
+public class TvViewModel extends BaseViewModel {
 
-    private PeopleList peopleList;
+    private Tvs mTv;
     private Context mContext;
     private String mPosterPath;
     private String mTitle;
 
-    public PeopleViewModel(Context context, PeopleList item) {
+    public TvViewModel(Context context, Tvs item) {
         super();
         this.mContext = context;
-        this.peopleList = item;
+        this.mTv = item;
     }
 
     public String getPosterPath() {
-        return peopleList.getProfilePath();
+        return mTv.getPosterPath();
     }
 
     public void setPosterPath(String posterPath) {
@@ -34,15 +33,15 @@ public class PeopleViewModel extends BaseViewModel {
     }
 
     public String getTitle() {
-        return peopleList.getName();
+        return mTv.getName();
     }
 
     public void setTitle(String title) {
         this.mTitle = title;
     }
 
-    public void updateList(PeopleItemBinding peopleItemBinding) {
-        peopleItemBinding.setPeople(this);
-        peopleItemBinding.executePendingBindings();
+    public void updateList(TvItemBinding tvItemBinding) {
+        tvItemBinding.setTv(this);
+        tvItemBinding.executePendingBindings();
     }
 }

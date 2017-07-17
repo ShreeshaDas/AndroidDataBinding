@@ -9,7 +9,7 @@ public class KnownFor {
 
     @SerializedName("vote_average")
     @Expose
-    private Integer voteAverage;
+    private float voteAverage;
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
@@ -53,7 +53,7 @@ public class KnownFor {
     @Expose
     private String releaseDate;
 
-    public Integer getVoteAverage() {
+    public float getVoteAverage() {
         return voteAverage;
     }
 

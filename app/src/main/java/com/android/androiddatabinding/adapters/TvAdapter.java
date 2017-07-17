@@ -1,22 +1,18 @@
 package com.android.androiddatabinding.adapters;
 
 import android.content.Context;
-import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
-import com.android.androiddatabinding.databinding.MovieItemBinding;
-import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.viewholder.MovieViewHolder;
-import com.android.androiddatabinding.viewmodel.MovieViewModel;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.android.androiddatabinding.databinding.TvItemBinding;
+import com.android.androiddatabinding.model.Tvs;
+import com.android.androiddatabinding.viewholder.TvViewHolder;
+import com.android.androiddatabinding.viewmodel.TvViewModel;
 
 import java.util.ArrayList;
 
@@ -24,14 +20,14 @@ import java.util.ArrayList;
  * Created by shreesha on 14/2/17.
  */
 
-public class MoviesAdapter extends BaseAdapter<Movie> {
+public class TvAdapter extends BaseAdapter<Tvs> {
 
-    private ArrayList<Movie> mMovies;
+    private ArrayList<Tvs> mTv;
     private Context mContext;
 
-    public MoviesAdapter(Context context, ArrayList<Movie> movies) {
-        super(movies);
-        this.mMovies = movies;
+    public TvAdapter(Context context, ArrayList<Tvs> tv) {
+        super(tv);
+        this.mTv = tv;
         this.mContext = context;
     }
 
@@ -43,13 +39,13 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
     @Override
     protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case MOVIE:
-                MovieItemBinding movieItemBinding = DataBindingUtil.inflate(
+            case TV:
+                TvItemBinding tvItemBinding = DataBindingUtil.inflate(
                         LayoutInflater.from(parent.getContext()),
-                        R.layout.movie_item,
+                        R.layout.tv_item,
                         parent,
                         false);
-                return new MovieViewHolder(movieItemBinding);
+                return new TvViewHolder(tvItemBinding);
         }
         return null;
     }
@@ -66,8 +62,8 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     @Override
     protected void bindItemViewHolder(BaseViewHolder viewHolder, int position) {
-        if (viewHolder instanceof MovieViewHolder) {
-            viewHolder.onBind(viewHolder, new MovieViewModel(mContext, getItem(position)), position);
+        if (viewHolder instanceof TvViewHolder) {
+            viewHolder.onBind(viewHolder, new TvViewModel(mContext, getItem(position)), position);
         }
     }
 
@@ -98,6 +94,6 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     @Override
     public int getItemViewType(int position) {
-        return MOVIE;
+        return TV;
     }
 }
