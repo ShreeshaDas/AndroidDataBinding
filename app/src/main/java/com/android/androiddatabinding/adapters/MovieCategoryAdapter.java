@@ -91,7 +91,7 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
     }
 
     @Override
-    protected void bindHeaderViewHolder(RecyclerView.ViewHolder viewHolder) {
+    protected void bindHeaderViewHolder(BaseViewHolder viewHolder, int position) {
     }
 
     @Override
@@ -115,7 +115,7 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
     }
 
     @Override
-    protected void bindFooterViewHolder(RecyclerView.ViewHolder viewHolder) {
+    protected void bindFooterViewHolder(BaseViewHolder viewHolder, int position) {
 
     }
 

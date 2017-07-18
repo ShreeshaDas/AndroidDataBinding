@@ -5,6 +5,7 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -13,6 +14,7 @@ import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.databinding.MovieItemBinding;
 import com.android.androiddatabinding.model.Movie;
+import com.android.androiddatabinding.viewholder.FooterViewHolder;
 import com.android.androiddatabinding.viewholder.MovieViewHolder;
 import com.android.androiddatabinding.viewmodel.MovieViewModel;
 import com.bumptech.glide.Glide;
@@ -56,11 +58,12 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     @Override
     protected RecyclerView.ViewHolder createFooterViewHolder(ViewGroup parent) {
-        return null;
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.footer_item, parent, false);
+        return new FooterViewHolder(v);
     }
 
     @Override
-    protected void bindHeaderViewHolder(RecyclerView.ViewHolder viewHolder) {
+    protected void bindHeaderViewHolder(BaseViewHolder viewHolder, int position) {
 
     }
 
@@ -72,8 +75,8 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
     }
 
     @Override
-    protected void bindFooterViewHolder(RecyclerView.ViewHolder viewHolder) {
-
+    protected void bindFooterViewHolder(BaseViewHolder viewHolder, int position) {
+        viewHolder.onBind(viewHolder, null, position);
     }
 
     @Override
@@ -88,7 +91,8 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     @Override
     public void addFooter() {
-
+        isFooterAdded = true;
+        add(new Movie());
     }
 
     @Override
@@ -98,6 +102,6 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     @Override
     public int getItemViewType(int position) {
-        return MOVIE;
+        return (isLastPosition(position) && isFooterAdded) ? FOOTER : MOVIE;
     }
 }

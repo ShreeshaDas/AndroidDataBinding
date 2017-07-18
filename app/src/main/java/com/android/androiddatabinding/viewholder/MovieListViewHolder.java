@@ -13,6 +13,7 @@ import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
 import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.Movie;
+import com.android.androiddatabinding.model.MoviesResponse;
 import com.android.androiddatabinding.viewmodel.MovieListViewModel;
 
 import java.util.ArrayList;

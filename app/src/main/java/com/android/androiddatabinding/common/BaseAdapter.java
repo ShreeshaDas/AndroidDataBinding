@@ -44,11 +44,11 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
 
     protected abstract RecyclerView.ViewHolder createFooterViewHolder(ViewGroup parent);
 
-    protected abstract void bindHeaderViewHolder(RecyclerView.ViewHolder viewHolder);
+    protected abstract void bindHeaderViewHolder(BaseViewHolder viewHolder, int position);
 
     protected abstract void bindItemViewHolder(BaseViewHolder viewHolder, int position);
 
-    protected abstract void bindFooterViewHolder(RecyclerView.ViewHolder viewHolder);
+    protected abstract void bindFooterViewHolder(BaseViewHolder viewHolder, int position);
 
     protected abstract void displayLoadMoreFooter();
 
@@ -95,7 +95,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         switch (getItemViewType(position)) {
             case HEADER:
-                bindHeaderViewHolder(viewHolder);
+                bindHeaderViewHolder((BaseViewHolder) viewHolder, position);
                 break;
             case MOVIE_TITLE:
             case MOVIE_LIST:
@@ -109,7 +109,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
                 bindItemViewHolder((BaseViewHolder) viewHolder, position);
                 break;
             case FOOTER:
-                bindFooterViewHolder(viewHolder);
+                bindFooterViewHolder((BaseViewHolder) viewHolder, position);
             default:
                 break;
         }

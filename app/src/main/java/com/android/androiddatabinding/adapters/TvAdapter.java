@@ -56,7 +56,7 @@ public class TvAdapter extends BaseAdapter<Tvs> {
     }
 
     @Override
-    protected void bindHeaderViewHolder(RecyclerView.ViewHolder viewHolder) {
+    protected void bindHeaderViewHolder(BaseViewHolder viewHolder, int position) {
 
     }
 
@@ -68,7 +68,7 @@ public class TvAdapter extends BaseAdapter<Tvs> {
     }
 
     @Override
-    protected void bindFooterViewHolder(RecyclerView.ViewHolder viewHolder) {
+    protected void bindFooterViewHolder(BaseViewHolder viewHolder, int position) {
 
     }
 
