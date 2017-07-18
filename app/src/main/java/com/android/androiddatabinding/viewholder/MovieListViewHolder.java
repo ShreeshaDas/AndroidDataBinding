@@ -13,7 +13,6 @@ import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
 import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.model.MoviesResponse;
 import com.android.androiddatabinding.viewmodel.MovieListViewModel;
 
 import java.util.ArrayList;
@@ -107,9 +106,9 @@ public class MovieListViewHolder extends BaseViewHolder {
     }
 
     private void updateMovieAdapter(MediaCategory mediaCategory) {
-        if (mediaCategory != null && mediaCategory.getMovies() != null && mediaCategory.getMovies().size() > 0) {
+        if (mediaCategory != null && mediaCategory.getMovies() != null && mediaCategory.getMovies().getResults().size() > 0) {
             if (mMediaCategory.equals(mediaCategory.getMediaCategory())) {
-                mMoviesAdapter.addAll(mediaCategory.getMovies());
+                mMoviesAdapter.addAll(mediaCategory.getMovies().getResults());
             }
         }
     }

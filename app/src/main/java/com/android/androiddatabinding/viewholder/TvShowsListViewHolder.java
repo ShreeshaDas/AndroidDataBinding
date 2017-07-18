@@ -106,9 +106,9 @@ public class TvShowsListViewHolder extends BaseViewHolder {
     }
 
     private void updateMovieAdapter(MediaCategory mediaCategory) {
-        if (mediaCategory != null && mediaCategory.getTvShows() != null && mediaCategory.getTvShows().size() > 0) {
+        if (mediaCategory != null && mediaCategory.getTvShows() != null && mediaCategory.getTvShows().getResults().size() > 0) {
             if (mMediaCategory.equals(mediaCategory.getMediaCategory())) {
-                mTvAdapter.addAll(mediaCategory.getTvShows());
+                mTvAdapter.addAll(mediaCategory.getTvShows().getResults());
             }
         }
     }

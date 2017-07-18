@@ -11,8 +11,8 @@ import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
+import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
-import com.android.androiddatabinding.model.Movie;
 import com.android.androiddatabinding.model.PeopleList;
 import com.android.androiddatabinding.viewmodel.PeopleListViewModel;
 
@@ -107,9 +107,9 @@ public class PeopleListViewHolder extends BaseViewHolder {
     }
 
     private void updateMovieAdapter(MediaCategory mediaCategory) {
-        if (mediaCategory != null && mediaCategory.getPeople() != null && mediaCategory.getPeople().size() > 0) {
+        if (mediaCategory != null && mediaCategory.getPeople() != null && mediaCategory.getPeople().getResults().size() > 0) {
             if (mMediaCategory.equals(mediaCategory.getMediaCategory())) {
-                mPeopleAdapter.addAll(mediaCategory.getPeople());
+                mPeopleAdapter.addAll(mediaCategory.getPeople().getResults());
             }
         }
     }

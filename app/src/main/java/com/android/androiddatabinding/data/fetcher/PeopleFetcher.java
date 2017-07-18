@@ -1,9 +1,10 @@
 package com.android.androiddatabinding.data.fetcher;
 
-import com.android.androiddatabinding.data.response.MovieApiCall;
 import com.android.androiddatabinding.data.response.PeopleApiCall;
-import com.android.androiddatabinding.model.MoviesResponse;
-import com.android.androiddatabinding.model.People;
+import com.android.androiddatabinding.model.GenericResponse;
+import com.android.androiddatabinding.model.PeopleList;
+
+import java.util.ArrayList;
 
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
@@ -13,7 +14,7 @@ import retrofit2.Retrofit;
  */
 
 public class PeopleFetcher {
-    public Observable<People> getPeopleList(Retrofit retrofit, String mediaType, String type, String apiKey, int page) {
+    public Observable<GenericResponse<ArrayList<PeopleList>>> getPeopleList(Retrofit retrofit, String mediaType, String type, String apiKey, int page) {
         PeopleApiCall nowPlayingMovieApiCall = retrofit.create(PeopleApiCall.class);
         return nowPlayingMovieApiCall.getPeople(mediaType, type, apiKey, page);
     }

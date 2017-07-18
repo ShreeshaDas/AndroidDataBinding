@@ -10,9 +10,9 @@ public class MediaCategory {
 
 
     private String mCategoryTitle;
-    private ArrayList<Movie> mMovies;
-    private ArrayList<Tvs> mTv;
-    private ArrayList<PeopleList> mPeople;
+    private GenericResponse<ArrayList<Movie>> mMovies;
+    private GenericResponse<ArrayList<Tvs>> mTv;
+    private GenericResponse<ArrayList<PeopleList>> mPeople;
     private String mQueryType;
     private String mMediaType;
     private NetworkError mNetworkError;
@@ -33,12 +33,12 @@ public class MediaCategory {
         this.mCategoryTitle = movieTitle;
     }
 
-    public ArrayList<Movie> getMovies() {
+    public GenericResponse<ArrayList<Movie>> getMovies() {
         return mMovies;
     }
 
-    public void setMovies(ArrayList<Movie> movies) {
-        this.mMovies = movies;
+    public void setMovies(GenericResponse<ArrayList<Movie>> movieGenericResponse) {
+        this.mMovies = movieGenericResponse;
     }
 
     public String getQueryType() {
@@ -73,20 +73,20 @@ public class MediaCategory {
         this.mViewType = viewType;
     }
 
-    public ArrayList<Tvs> getTvShows() {
+    public GenericResponse<ArrayList<Tvs>> getTvShows() {
         return mTv;
     }
 
-    public void setTv(ArrayList<Tvs> tv) {
-        this.mTv = tv;
+    public void setTv(GenericResponse<ArrayList<Tvs>> tvsGenericResponse) {
+        this.mTv = tvsGenericResponse;
     }
 
-    public ArrayList<PeopleList> getPeople() {
+    public GenericResponse<ArrayList<PeopleList>> getPeople() {
         return mPeople;
     }
 
-    public void setPeople(ArrayList<PeopleList> people) {
-        this.mPeople = people;
+    public void setPeople(GenericResponse<ArrayList<PeopleList>> peopleGenericResponse) {
+        this.mPeople = peopleGenericResponse;
     }
 
 

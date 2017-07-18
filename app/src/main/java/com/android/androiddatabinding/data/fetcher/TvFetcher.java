@@ -1,9 +1,10 @@
 package com.android.androiddatabinding.data.fetcher;
 
-import com.android.androiddatabinding.data.response.MovieApiCall;
 import com.android.androiddatabinding.data.response.TvApiCall;
-import com.android.androiddatabinding.model.MoviesResponse;
-import com.android.androiddatabinding.model.Tv;
+import com.android.androiddatabinding.model.GenericResponse;
+import com.android.androiddatabinding.model.Tvs;
+
+import java.util.ArrayList;
 
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
@@ -13,7 +14,7 @@ import retrofit2.Retrofit;
  */
 
 public class TvFetcher {
-    public Observable<Tv> getTvsList(Retrofit retrofit, String mediaType, String type, String apiKey, int page) {
+    public Observable<GenericResponse<ArrayList<Tvs>>> getTvsList(Retrofit retrofit, String mediaType, String type, String apiKey, int page) {
         TvApiCall tvApiCall = retrofit.create(TvApiCall.class);
         return tvApiCall.getTvs(mediaType, type, apiKey, page);
     }

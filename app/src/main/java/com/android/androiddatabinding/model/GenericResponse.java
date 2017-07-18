@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by shreesha on 18/7/17.
  */
 
-public class GenericResponse<T> {
+public class GenericResponse<T>  {
 
     @SerializedName("page")
     @Expose
@@ -22,7 +22,7 @@ public class GenericResponse<T> {
     private Integer totalPages;
     @SerializedName("results")
     @Expose
-    private ArrayList<T> results = null;
+    private T results = null;
 
     public Integer getPage() {
         return page;
@@ -48,11 +48,11 @@ public class GenericResponse<T> {
         this.totalPages = totalPages;
     }
 
-    public ArrayList<T> getResults() {
+    public T getResults() {
         return results;
     }
 
-    public void setResults(ArrayList<T> results) {
+    public void setResults(T results) {
         this.results = results;
     }
 }

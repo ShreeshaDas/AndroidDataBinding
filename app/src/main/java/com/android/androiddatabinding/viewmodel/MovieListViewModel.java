@@ -13,9 +13,9 @@ import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.MoviesFetcher;
 import com.android.androiddatabinding.internal.Constants;
+import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.Movie;
-import com.android.androiddatabinding.model.MoviesResponse;
 import com.android.androiddatabinding.model.NetworkError;
 
 import java.io.IOException;
@@ -66,11 +66,11 @@ public class MovieListViewModel extends BaseViewModel {
         return mMediaCategory.getMediaCategory();
     }
 
-    public ArrayList<Movie> getMovies() {
+    public GenericResponse<ArrayList<Movie>> getMovies() {
         return mMediaCategory.getMovies();
     }
 
-    public void setMovies(ArrayList<Movie> movies) {
+    public void setMovies(GenericResponse<ArrayList<Movie>> movies) {
         this.mMediaCategory.setMovies(movies);
     }
 
@@ -87,7 +87,7 @@ public class MovieListViewModel extends BaseViewModel {
         if (movieListViewModel.getMovies() == null) {
             getMovies(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
         } else {
-            if (movieListViewModel.getMovies() != null && movieListViewModel.getMovies().size() == 0) {
+            if (movieListViewModel.getMovies() != null && movieListViewModel.getMovies().getResults().size() == 0) {
                 if (mMediaCategory.getNetworkError() != null) {
                     showError();
                 } else {
@@ -100,7 +100,7 @@ public class MovieListViewModel extends BaseViewModel {
         }
     }
 
-    private void setMedia(ArrayList<Movie> movies) {
+    private void setMedia(GenericResponse<ArrayList<Movie>> movies) {
         updateData(movies);
     }
 
@@ -110,9 +110,9 @@ public class MovieListViewModel extends BaseViewModel {
         Disposable disposable = new MoviesFetcher().getMoviesList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<MoviesResponse>() {
+                .subscribe(new Consumer<GenericResponse<ArrayList<Movie>>>() {
                     @Override
-                    public void accept(MoviesResponse moviesResponse) throws Exception {
+                    public void accept(GenericResponse<ArrayList<Movie>> moviesResponse) throws Exception {
                         updateMovieList(moviesResponse);
                     }
                 }, new Consumer<Throwable>() {
@@ -149,9 +149,9 @@ public class MovieListViewModel extends BaseViewModel {
         showError();
     }
 
-    private void updateMovieList(MoviesResponse moviesResponse) {
+    private void updateMovieList(GenericResponse<ArrayList<Movie>> moviesResponse) {
         if (moviesResponse != null && moviesResponse.getResults() != null && moviesResponse.getResults().size() > 0) {
-            updateData(moviesResponse.getResults());
+            updateData(moviesResponse);
         }
     }
 
@@ -162,7 +162,7 @@ public class MovieListViewModel extends BaseViewModel {
         //RxBus.getInstance().send(mMediaCategory);
     }
 
-    private void updateData(ArrayList<Movie> movies) {
+    private void updateData(GenericResponse<ArrayList<Movie>> movies) {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setMovies(movies);

@@ -13,9 +13,9 @@ import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.TvFetcher;
 import com.android.androiddatabinding.internal.Constants;
+import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.NetworkError;
-import com.android.androiddatabinding.model.Tv;
 import com.android.androiddatabinding.model.Tvs;
 
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class TvShowsViewModel extends BaseViewModel {
         return mMediaCategory.getMediaCategory();
     }
 
-    public ArrayList<Tvs> getTvShows() {
+    public GenericResponse<ArrayList<Tvs>> getTvShows() {
         return mMediaCategory.getTvShows();
     }
 
@@ -81,7 +81,7 @@ public class TvShowsViewModel extends BaseViewModel {
         if (tvShowsViewModel.getTvShows() == null) {
             getTvShows(context, tvShowsViewModel.getQueryType(), tvShowsViewModel.getMediaType());
         } else {
-            if (tvShowsViewModel.getTvShows() != null && tvShowsViewModel.getTvShows().size() == 0) {
+            if (tvShowsViewModel.getTvShows() != null && tvShowsViewModel.getTvShows().getResults().size() == 0) {
                 if (mMediaCategory.getNetworkError() != null) {
                     showError();
                 } else {
@@ -94,11 +94,11 @@ public class TvShowsViewModel extends BaseViewModel {
         }
     }
 
-    private void setMedia(ArrayList<Tvs> tvShows) {
+    private void setMedia(GenericResponse<ArrayList<Tvs>> tvShows) {
         updateData(tvShows);
     }
 
-    private void updateData(ArrayList<Tvs> tvShows) {
+    private void updateData(GenericResponse<ArrayList<Tvs>> tvShows) {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
@@ -110,9 +110,9 @@ public class TvShowsViewModel extends BaseViewModel {
         Disposable disposable = new TvFetcher().getTvsList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Tv>() {
+                .subscribe(new Consumer<GenericResponse<ArrayList<Tvs>>>() {
                     @Override
-                    public void accept(Tv tvResponse) throws Exception {
+                    public void accept(GenericResponse<ArrayList<Tvs>> tvResponse) throws Exception {
                         updateTvShowsList(tvResponse);
                     }
                 }, new Consumer<Throwable>() {
@@ -124,20 +124,20 @@ public class TvShowsViewModel extends BaseViewModel {
         mCompositeDisposable.add(disposable);
     }
 
-    private void updateTvShowsList(Tv tv) {
+    private void updateTvShowsList(GenericResponse<ArrayList<Tvs>> tv) {
         if (tv != null && tv.getResults() != null && tv.getResults().size() > 0) {
-            upTvShowData(tv.getResults());
+            upTvShowData(tv);
         }
     }
 
-    private void upTvShowData(ArrayList<Tvs> tvShows) {
+    private void upTvShowData(GenericResponse<ArrayList<Tvs>> tvShows) {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
         RxBus.getInstance().send(mMediaCategory);
     }
 
-    private void setTvShows(ArrayList<Tvs> tvShows) {
+    private void setTvShows(GenericResponse<ArrayList<Tvs>> tvShows) {
         this.mMediaCategory.setTv(tvShows);
     }
 

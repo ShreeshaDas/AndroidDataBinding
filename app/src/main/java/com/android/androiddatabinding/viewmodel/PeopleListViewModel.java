@@ -13,9 +13,9 @@ import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.PeopleFetcher;
 import com.android.androiddatabinding.internal.Constants;
+import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.NetworkError;
-import com.android.androiddatabinding.model.People;
 import com.android.androiddatabinding.model.PeopleList;
 
 import java.io.IOException;
@@ -66,11 +66,11 @@ public class PeopleListViewModel extends BaseViewModel {
         return mMediaCategory.getMediaCategory();
     }
 
-    public ArrayList<PeopleList> getPeople() {
+    public GenericResponse<ArrayList<PeopleList>> getPeople() {
         return mMediaCategory.getPeople();
     }
 
-    public void setPeople(ArrayList<PeopleList> peopleLists) {
+    public void setPeople(GenericResponse<ArrayList<PeopleList>> peopleLists) {
         this.mMediaCategory.setPeople(peopleLists);
     }
 
@@ -87,7 +87,7 @@ public class PeopleListViewModel extends BaseViewModel {
         if(movieListViewModel.getPeople() == null) {
             getPeople(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
         } else {
-        if (movieListViewModel.getPeople() != null && movieListViewModel.getPeople().size() == 0) {
+        if (movieListViewModel.getPeople() != null && movieListViewModel.getPeople().getResults().size() == 0) {
             if (mMediaCategory.getNetworkError() != null) {
                 showError();
             } else {
@@ -99,7 +99,7 @@ public class PeopleListViewModel extends BaseViewModel {
         }}
     }
 
-    private void setPeopleList(ArrayList<PeopleList> peopleList) {
+    private void setPeopleList(GenericResponse<ArrayList<PeopleList>> peopleList) {
         updateData(peopleList);
     }
 
@@ -109,9 +109,9 @@ public class PeopleListViewModel extends BaseViewModel {
         Disposable disposable = new PeopleFetcher().getPeopleList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<People>() {
+                .subscribe(new Consumer<GenericResponse<ArrayList<PeopleList>>>() {
                     @Override
-                    public void accept(People people) throws Exception {
+                    public void accept(GenericResponse<ArrayList<PeopleList>> people) throws Exception {
                         updatePeopleList(people);
                     }
                 }, new Consumer<Throwable>() {
@@ -148,9 +148,9 @@ public class PeopleListViewModel extends BaseViewModel {
         showError();
     }
 
-    private void updatePeopleList(People people) {
+    private void updatePeopleList(GenericResponse<ArrayList<PeopleList>> people) {
         if (people != null && people.getResults() != null && people.getResults().size() > 0) {
-            updateData(people.getResults());
+            updateData(people);
         }
     }
 
@@ -161,7 +161,7 @@ public class PeopleListViewModel extends BaseViewModel {
         //RxBus.getInstance().send(mMediaCategory);
     }
 
-    private void updateData(ArrayList<PeopleList> people) {
+    private void updateData(GenericResponse<ArrayList<PeopleList>> people) {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setPeople(people);
