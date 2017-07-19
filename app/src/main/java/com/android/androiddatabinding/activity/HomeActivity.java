@@ -19,10 +19,8 @@ import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
-public class HomeActivity extends AppCompatActivity implements Observer {
+public class HomeActivity extends AppCompatActivity{
 
     private ActivityMainBinding mActivityMainBinding;
     private HomeViewModel mHomeViewModel;
@@ -40,7 +38,6 @@ public class HomeActivity extends AppCompatActivity implements Observer {
         setUpNavigationDrawer();
         setUpRecycleView(mActivityMainBinding.movieList);
         //getTvShows();
-        setupObserver(mHomeViewModel);
     }
 
     private void setUpToolbar(Toolbar toolbar) {
@@ -88,10 +85,6 @@ public class HomeActivity extends AppCompatActivity implements Observer {
                 });
     }
 
-    private void setupObserver(Observable observable) {
-        observable.addObserver(this);
-    }
-
 
     private void setUpRecycleView(RecyclerView recycleView) {
         mMovieCategoryAdapter = new MovieCategoryAdapter(this, new ArrayList<MediaCategory>());
@@ -115,10 +108,6 @@ public class HomeActivity extends AppCompatActivity implements Observer {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void update(Observable observable, Object arg) {
     }
 
     private ArrayList<MediaCategory> createMovieCategoryList() {

@@ -1,20 +1,28 @@
 package com.android.androiddatabinding.common;
 
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
+
+import com.android.androiddatabinding.BR;
+
 
 /**
  * Created by shreesha on 11/7/17.
  */
 
-public abstract class BaseViewHolder extends RecyclerView.ViewHolder {
-    public BaseViewHolder(View itemView) {
-        super(itemView);
+public class BaseViewHolder extends RecyclerView.ViewHolder {
+
+    private final ViewDataBinding binding;
+
+    public BaseViewHolder(ViewDataBinding binding) {
+        super(binding.getRoot());
+        this.binding = binding;
     }
 
-    public abstract void onBind(final RecyclerView.ViewHolder holder, BaseViewModel baseViewModel, int position);
+    public void bind(Object obj) {
+        binding.setVariable(BR.obj, obj);
+        binding.executePendingBindings();
+    }
 
-    public abstract void onDetachedFromRecyclerView(RecyclerView recyclerView);
 
-    public abstract void onViewRecycled(RecyclerView.ViewHolder viewHolder);
 }

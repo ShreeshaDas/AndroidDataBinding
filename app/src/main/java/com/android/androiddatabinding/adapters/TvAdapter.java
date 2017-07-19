@@ -1,17 +1,11 @@
 package com.android.androiddatabinding.adapters;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
-import com.android.androiddatabinding.databinding.TvItemBinding;
 import com.android.androiddatabinding.model.Tvs;
-import com.android.androiddatabinding.viewholder.TvViewHolder;
 import com.android.androiddatabinding.viewmodel.TvViewModel;
 
 import java.util.ArrayList;
@@ -32,44 +26,33 @@ public class TvAdapter extends BaseAdapter<Tvs> {
     }
 
     @Override
-    protected RecyclerView.ViewHolder createHeaderViewHolder(ViewGroup parent) {
+    protected int getHeaderLayoutId() {
+        return 0;
+    }
+
+    @Override
+    protected int getItemLayoutId(int position) {
+        return  R.layout.tv_item;
+    }
+
+    @Override
+    protected int getFooterLayoutId() {
+        return 0;
+    }
+
+    @Override
+    protected Object getHeaderViewModel(int position) {
         return null;
     }
 
     @Override
-    protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case TV:
-                TvItemBinding tvItemBinding = DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.getContext()),
-                        R.layout.tv_item,
-                        parent,
-                        false);
-                return new TvViewHolder(tvItemBinding);
-        }
+    protected Object getItemViewModel(int position) {
+        return new TvViewModel(mContext, getItem(position));
+    }
+
+    @Override
+    protected Object getFooterViewModel(int position) {
         return null;
-    }
-
-    @Override
-    protected RecyclerView.ViewHolder createFooterViewHolder(ViewGroup parent) {
-        return null;
-    }
-
-    @Override
-    protected void bindHeaderViewHolder(BaseViewHolder viewHolder, int position) {
-
-    }
-
-    @Override
-    protected void bindItemViewHolder(BaseViewHolder viewHolder, int position) {
-        if (viewHolder instanceof TvViewHolder) {
-            viewHolder.onBind(viewHolder, new TvViewModel(mContext, getItem(position)), position);
-        }
-    }
-
-    @Override
-    protected void bindFooterViewHolder(BaseViewHolder viewHolder, int position) {
-
     }
 
     @Override
@@ -88,12 +71,17 @@ public class TvAdapter extends BaseAdapter<Tvs> {
     }
 
     @Override
+    protected int getViewType(int position) {
+        return TV;
+    }
+
+    @Override
     public void onViewRecycled(BaseViewHolder viewHolder) {
 
     }
 
     @Override
     public int getItemViewType(int position) {
-        return TV;
+        return super.getItemViewType(position);
     }
 }

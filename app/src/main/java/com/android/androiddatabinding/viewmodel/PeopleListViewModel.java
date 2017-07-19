@@ -1,17 +1,23 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.util.SparseIntArray;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import com.android.androiddatabinding.AndroidDataBindingApplication;
 import com.android.androiddatabinding.R;
+import com.android.androiddatabinding.adapters.PeopleAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.PeopleFetcher;
+import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
 import com.android.androiddatabinding.internal.Constants;
 import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
@@ -46,14 +52,19 @@ public class PeopleListViewModel extends BaseViewModel {
     public ObservableField<String> errorMessageLabel;
     public ObservableInt errorLabel;
     public ObservableInt mediaRecyclerView;
+    private PeopleAdapter mPeopleAdapter;
+    private PeopleListLayoutBinding mPeopleListLayoutBinding;
 
     public PeopleListViewModel(Context context, MediaCategory mediaCategory) {
         this.mMediaCategory = mediaCategory;
+        getBinding();
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_people_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
         mContext = context;
         initView();
+        initAdapter();
+        getItemList();
         subscribe();
     }
 
@@ -83,20 +94,36 @@ public class PeopleListViewModel extends BaseViewModel {
     }
 
 
-    public void getItemList(Context context, PeopleListViewModel movieListViewModel) {
-        if(movieListViewModel.getPeople() == null) {
-            getPeople(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
+    public void initAdapter() {
+        if (mPeopleAdapter == null) {
+            mPeopleAdapter = new PeopleAdapter(mContext, new ArrayList<PeopleList>());
+            mPeopleListLayoutBinding.movieList.setAdapter(mPeopleAdapter);
+            mPeopleListLayoutBinding.movieList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+        }
+    }
+
+    public void getItemList() {
+        if (getPeople() == null) {
+            getPeople(getQueryType(), getMediaType());
         } else {
-        if (movieListViewModel.getPeople() != null && movieListViewModel.getPeople().getResults().size() == 0) {
-            if (mMediaCategory.getNetworkError() != null) {
-                showError();
+            if (getPeople() != null && getPeople().getResults().size() == 0) {
+                if (mMediaCategory.getNetworkError() != null) {
+                    showError();
+                } else {
+                    Log.d(TAG, getCategoryTitle() + " " + getQueryType());
+                    getPeople(getQueryType(), getMediaType());
+                }
             } else {
-                Log.d(TAG, movieListViewModel.getCategoryTitle() + " " + movieListViewModel.getQueryType());
-                getPeople(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
+                setPeopleList(getPeople());
             }
-        } else {
-            setPeopleList(movieListViewModel.getPeople());
-        }}
+        }
+    }
+
+    public void handelScrollPosition(PeopleListLayoutBinding peopleListLayoutBinding, SparseIntArray listPosition, int position) {
+        int lastSeenFirstPosition = listPosition.get(position, 0);
+        if (lastSeenFirstPosition >= 0) {
+            peopleListLayoutBinding.movieList.scrollToPosition(lastSeenFirstPosition);
+        }
     }
 
     private void setPeopleList(GenericResponse<ArrayList<PeopleList>> peopleList) {
@@ -104,8 +131,8 @@ public class PeopleListViewModel extends BaseViewModel {
     }
 
 
-    private void getPeople(Context context, String type, String mediaType) {
-        AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(context);
+    private void getPeople(String type, String mediaType) {
+        AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(mContext);
         Disposable disposable = new PeopleFetcher().getPeopleList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -168,6 +195,14 @@ public class PeopleListViewModel extends BaseViewModel {
         RxBus.getInstance().send(mMediaCategory);
     }
 
+    private void updateMovieAdapter(MediaCategory mediaCategory) {
+        if (mediaCategory != null && mediaCategory.getPeople() != null && mediaCategory.getPeople().getResults().size() > 0) {
+            if (mMediaCategory.equals(mediaCategory.getMediaCategory())) {
+                mPeopleAdapter.addAll(mediaCategory.getPeople().getResults());
+            }
+        }
+    }
+
     public void subscribe() {
         Disposable disposable = RxBus.getInstance().getBus()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -196,5 +231,16 @@ public class PeopleListViewModel extends BaseViewModel {
     public void reset() {
         unSubscribeFromObservable();
         mCompositeDisposable = null;
+    }
+
+    private void getBinding() {
+        LayoutInflater layoutInflater =
+                LayoutInflater.from(mContext);
+        View movieListView = layoutInflater.inflate(R.layout.people_list_layout, null, false);
+        mPeopleListLayoutBinding = DataBindingUtil.getBinding(movieListView);
+    }
+
+    public void setPagination(Context context, PeopleListLayoutBinding peopleListLayoutBinding, PeopleListViewModel baseViewModel) {
+
     }
 }

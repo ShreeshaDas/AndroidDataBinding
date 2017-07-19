@@ -1,6 +1,7 @@
 package com.android.androiddatabinding.viewmodel;
 
 import com.android.androiddatabinding.common.BaseViewModel;
+import com.android.androiddatabinding.model.MediaCategory;
 
 /**
  * Created by shreesha on 12/7/17.
@@ -8,19 +9,15 @@ import com.android.androiddatabinding.common.BaseViewModel;
 
 public class MovieTitleViewModel extends BaseViewModel {
 
-    public String mMovieTitle;
+    public MediaCategory mMovieCategory;
+    public String mTitle;
 
-    public MovieTitleViewModel(String mMovieTitle) {
-        this.mMovieTitle = mMovieTitle;
+    public MovieTitleViewModel(MediaCategory mediaCategory) {
+        this.mMovieCategory = mediaCategory;
     }
 
-
-    public String getMovieTitle() {
-        return mMovieTitle;
-    }
-
-    public void setMovieTitle(String movieTitle) {
-        this.mMovieTitle = movieTitle;
+    public String getTitle() {
+        return mMovieCategory.getMediaCategory();
     }
 
 }

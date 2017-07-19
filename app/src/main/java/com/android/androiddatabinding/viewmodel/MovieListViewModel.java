@@ -1,17 +1,22 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import com.android.androiddatabinding.AndroidDataBindingApplication;
 import com.android.androiddatabinding.R;
+import com.android.androiddatabinding.adapters.MoviesAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.MoviesFetcher;
+import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
 import com.android.androiddatabinding.internal.Constants;
 import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
@@ -46,15 +51,28 @@ public class MovieListViewModel extends BaseViewModel {
     public ObservableField<String> errorMessageLabel;
     public ObservableInt errorLabel;
     public ObservableInt mediaRecyclerView;
+    private MoviesAdapter mMoviesAdapter;
+    private MovieListLayoutBinding mMovieListLayoutBinding;
+
 
     public MovieListViewModel(Context context, MediaCategory mediaCategory) {
         this.mMediaCategory = mediaCategory;
+        getBinding(context);
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
         mContext = context;
         initView();
+        initAdapter();
+        getItemList();
         subscribe();
+    }
+
+    private void getBinding(Context context) {
+        LayoutInflater layoutInflater =
+                LayoutInflater.from(context);
+        View movieListView = layoutInflater.inflate(R.layout.movie_list_layout, null, false);
+        mMovieListLayoutBinding = DataBindingUtil.getBinding(movieListView);
     }
 
     private void initView() {
@@ -83,19 +101,19 @@ public class MovieListViewModel extends BaseViewModel {
     }
 
 
-    public void getItemList(Context context, MovieListViewModel movieListViewModel) {
-        if (movieListViewModel.getMovies() == null) {
-            getMovies(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
+    public void getItemList() {
+        if (getMovies() == null) {
+            getMovies(mContext, getQueryType(), getMediaType());
         } else {
-            if (movieListViewModel.getMovies() != null && movieListViewModel.getMovies().getResults().size() == 0) {
+            if (getMovies() != null && getMovies().getResults().size() == 0) {
                 if (mMediaCategory.getNetworkError() != null) {
                     showError();
                 } else {
-                    Log.d(TAG, movieListViewModel.getCategoryTitle() + " " + movieListViewModel.getQueryType());
-                    getMovies(context, movieListViewModel.getQueryType(), movieListViewModel.getMediaType());
+                    Log.d(TAG, getCategoryTitle() + " " + getQueryType());
+                    getMovies(mContext, getQueryType(), getMediaType());
                 }
             } else {
-                setMedia(movieListViewModel.getMovies());
+                setMedia(getMovies());
             }
         }
     }
@@ -166,7 +184,7 @@ public class MovieListViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setMovies(movies);
-        RxBus.getInstance().send(mMediaCategory);
+        updateMovieAdapter(mMediaCategory);
     }
 
     public void subscribe() {
@@ -198,4 +216,23 @@ public class MovieListViewModel extends BaseViewModel {
         unSubscribeFromObservable();
         mCompositeDisposable = null;
     }
+
+    public void setPagination(Context context, MovieListLayoutBinding movieListLayoutBinding, MovieListViewModel baseViewModel) {
+
+    }
+
+    public void initAdapter() {
+        if (mMoviesAdapter == null) {
+            mMoviesAdapter = new MoviesAdapter(mContext, new ArrayList<Movie>());
+            mMovieListLayoutBinding.movieList.setAdapter(mMoviesAdapter);
+            mMovieListLayoutBinding.movieList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+        }
+    }
+
+    private void updateMovieAdapter(MediaCategory mediaCategory) {
+        if (mediaCategory != null && mediaCategory.getMovies() != null && mediaCategory.getMovies().getResults().size() > 0) {
+            mMoviesAdapter.addAll(mediaCategory.getMovies().getResults());
+        }
+    }
+
 }

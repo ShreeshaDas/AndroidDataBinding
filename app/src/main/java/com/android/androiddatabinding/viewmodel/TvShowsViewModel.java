@@ -1,17 +1,23 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.util.SparseIntArray;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import com.android.androiddatabinding.AndroidDataBindingApplication;
 import com.android.androiddatabinding.R;
+import com.android.androiddatabinding.adapters.TvAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.TvFetcher;
+import com.android.androiddatabinding.databinding.TvShowsListLayoutBinding;
 import com.android.androiddatabinding.internal.Constants;
 import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
@@ -45,18 +51,23 @@ public class TvShowsViewModel extends BaseViewModel {
     public ObservableField<String> errorMessageLabel;
     public ObservableInt errorLabel;
     public ObservableInt mediaRecyclerView;
+    private TvAdapter mTvAdapter;
+    private TvShowsListLayoutBinding mTvShowsListLayoutBinding;
 
     public TvShowsViewModel(Context context, MediaCategory mediaCategory) {
         this.mMediaCategory = mediaCategory;
+        getBinding();
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
         mContext = context;
         initView();
+        initAdapter();
+        getItemList();
         subscribe();
     }
 
-    private void initView() {
+    public void initView() {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
     }
@@ -77,19 +88,28 @@ public class TvShowsViewModel extends BaseViewModel {
         return mMediaCategory.getQueryType();
     }
 
-    public void getItemList(Context context, TvShowsViewModel tvShowsViewModel) {
-        if (tvShowsViewModel.getTvShows() == null) {
-            getTvShows(context, tvShowsViewModel.getQueryType(), tvShowsViewModel.getMediaType());
+    public void initAdapter() {
+        if (mTvAdapter == null) {
+            mTvAdapter = new TvAdapter(mContext, new ArrayList<Tvs>());
+            mTvShowsListLayoutBinding.movieList.setAdapter(mTvAdapter);
+            mTvShowsListLayoutBinding.movieList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+        }
+    }
+
+
+    public void getItemList() {
+        if (getTvShows() == null) {
+            getTvShows(getQueryType(), getMediaType());
         } else {
-            if (tvShowsViewModel.getTvShows() != null && tvShowsViewModel.getTvShows().getResults().size() == 0) {
+            if (getTvShows() != null && getTvShows().getResults().size() == 0) {
                 if (mMediaCategory.getNetworkError() != null) {
                     showError();
                 } else {
-                    Log.d(TAG, tvShowsViewModel.getCategoryTitle() + " " + tvShowsViewModel.getQueryType());
-                    getTvShows(context, tvShowsViewModel.getQueryType(), tvShowsViewModel.getMediaType());
+                    Log.d(TAG, getCategoryTitle() + " " + getQueryType());
+                    getTvShows(getQueryType(), getMediaType());
                 }
             } else {
-                setMedia(tvShowsViewModel.getTvShows());
+                setMedia(getTvShows());
             }
         }
     }
@@ -105,8 +125,8 @@ public class TvShowsViewModel extends BaseViewModel {
         RxBus.getInstance().send(mMediaCategory);
     }
 
-    public void getTvShows(Context context, String type, String mediaType) {
-        AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(context);
+    public void getTvShows(String type, String mediaType) {
+        AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(mContext);
         Disposable disposable = new TvFetcher().getTvsList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -134,7 +154,7 @@ public class TvShowsViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
-        RxBus.getInstance().send(mMediaCategory);
+        updateMovieAdapter(mMediaCategory);
     }
 
     private void setTvShows(GenericResponse<ArrayList<Tvs>> tvShows) {
@@ -201,4 +221,25 @@ public class TvShowsViewModel extends BaseViewModel {
         unSubscribeFromObservable();
         mCompositeDisposable = null;
     }
+
+    public void handelScrollPosition(TvShowsListLayoutBinding tvShowsListLayoutBinding, SparseIntArray listPosition, int position) {
+        int lastSeenFirstPosition = listPosition.get(position, 0);
+        if (lastSeenFirstPosition >= 0) {
+            tvShowsListLayoutBinding.movieList.scrollToPosition(lastSeenFirstPosition);
+        }
+    }
+
+    private void updateMovieAdapter(MediaCategory mediaCategory) {
+        if (mediaCategory != null && mediaCategory.getTvShows() != null && mediaCategory.getTvShows().getResults().size() > 0) {
+            mTvAdapter.addAll(mediaCategory.getTvShows().getResults());
+        }
+    }
+
+    private void getBinding() {
+        LayoutInflater layoutInflater =
+                LayoutInflater.from(mContext);
+        View movieListView = layoutInflater.inflate(R.layout.people_list_layout, null, false);
+        mTvShowsListLayoutBinding = DataBindingUtil.getBinding(movieListView);
+    }
+
 }

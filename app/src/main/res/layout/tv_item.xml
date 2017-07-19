@@ -4,7 +4,7 @@
     <data>
 
         <variable
-            name="tv"
+            name="obj"
             type="com.android.androiddatabinding.viewmodel.TvViewModel" />
     </data>
 
@@ -26,7 +26,7 @@
                 android:id="@+id/tv_poster"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{tv.posterPath}" />
+                android:src="@{obj.posterPath}" />
 
         </android.support.v7.widget.CardView>
 
@@ -37,7 +37,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:padding="10dp"
-            android:text="@{tv.title}"
+            android:text="@{obj.title}"
             android:textColor="@android:color/black"
             android:textSize="16dp" />
     </LinearLayout>

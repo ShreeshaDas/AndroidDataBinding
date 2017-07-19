@@ -40,8 +40,4 @@ public class TvViewModel extends BaseViewModel {
         this.mTitle = title;
     }
 
-    public void updateList(TvItemBinding tvItemBinding) {
-        tvItemBinding.setTv(this);
-        tvItemBinding.executePendingBindings();
-    }
 }

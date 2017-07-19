@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="movielist"
+            name="obj"
             type="com.android.androiddatabinding.viewmodel.MovieListViewModel" />
     </data>
 
@@ -19,7 +19,7 @@
             android:id="@+id/movie_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{movielist.mediaRecyclerView}" />
+            android:visibility="@{obj.mediaRecyclerView}" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -27,8 +27,8 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:padding="10dp"
-            android:text="@{movielist.errorMessageLabel}"
+            android:text="@{obj.errorMessageLabel}"
             android:textSize="20sp"
-            android:visibility="@{movielist.errorLabel}" />
+            android:visibility="@{obj.errorLabel}" />
     </RelativeLayout>
 </layout>

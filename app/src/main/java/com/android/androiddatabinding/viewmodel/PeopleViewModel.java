@@ -40,9 +40,4 @@ public class PeopleViewModel extends BaseViewModel {
     public void setTitle(String title) {
         this.mTitle = title;
     }
-
-    public void updateList(PeopleItemBinding peopleItemBinding) {
-        peopleItemBinding.setPeople(this);
-        peopleItemBinding.executePendingBindings();
-    }
 }

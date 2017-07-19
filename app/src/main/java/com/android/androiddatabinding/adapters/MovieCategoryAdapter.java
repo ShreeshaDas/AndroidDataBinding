@@ -1,25 +1,14 @@
 package com.android.androiddatabinding.adapters;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
-import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
-import com.android.androiddatabinding.databinding.MovieTitleLayoutBinding;
-import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
-import com.android.androiddatabinding.databinding.TvShowsListLayoutBinding;
 import com.android.androiddatabinding.model.MediaCategory;
-import com.android.androiddatabinding.viewholder.MovieListViewHolder;
-import com.android.androiddatabinding.viewholder.MovieTitleViewHolder;
-import com.android.androiddatabinding.viewholder.PeopleListViewHolder;
-import com.android.androiddatabinding.viewholder.TvShowsListViewHolder;
 import com.android.androiddatabinding.viewmodel.MovieListViewModel;
 import com.android.androiddatabinding.viewmodel.MovieTitleViewModel;
 import com.android.androiddatabinding.viewmodel.PeopleListViewModel;
@@ -44,79 +33,59 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
     }
 
     @Override
-    protected RecyclerView.ViewHolder createHeaderViewHolder(ViewGroup parent) {
-        return null;
+    protected int getHeaderLayoutId() {
+        return 0;
     }
 
     @Override
-    protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case MOVIE_TITLE:
-            case TV_TITLE:
-            case PEOPLE_TITLE:
-                MovieTitleLayoutBinding movieTitleLayoutBinding = DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.getContext()),
-                        R.layout.movie_title_layout,
-                        parent,
-                        false);
-                return new MovieTitleViewHolder(movieTitleLayoutBinding);
-            case MOVIE_LIST:
-                MovieListLayoutBinding movieListLayoutBinding = DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.getContext()),
-                        R.layout.movie_list_layout,
-                        parent,
-                        false);
-                return new MovieListViewHolder(movieListLayoutBinding);
-            case TV_LIST:
-                TvShowsListLayoutBinding tvShowsListLayoutBinding = DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.getContext()),
-                        R.layout.tv_shows_list_layout,
-                        parent,
-                        false);
-                return new TvShowsListViewHolder(tvShowsListLayoutBinding);
-            case PEOPLE_LIST:
-                PeopleListLayoutBinding peopleListLayoutBinding = DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.getContext()),
-                        R.layout.people_list_layout,
-                        parent,
-                        false);
-                return new PeopleListViewHolder(peopleListLayoutBinding);
-        }
-        return null;
-    }
-
-    @Override
-    protected RecyclerView.ViewHolder createFooterViewHolder(ViewGroup parent) {
-        return null;
-    }
-
-    @Override
-    protected void bindHeaderViewHolder(BaseViewHolder viewHolder, int position) {
-    }
-
-    @Override
-    protected void bindItemViewHolder(BaseViewHolder viewHolder, int position) {
+    protected int getItemLayoutId(int position) {
         switch (getItemViewType(position)) {
             case MOVIE_TITLE:
             case TV_TITLE:
             case PEOPLE_TITLE:
-                viewHolder.onBind(viewHolder, new MovieTitleViewModel(getItem(position).getMediaCategory()), position);
-                break;
+                return R.layout.movie_title_layout;
             case MOVIE_LIST:
-                viewHolder.onBind(viewHolder, new MovieListViewModel(mContext, getItem(position)), position);
-                break;
+                return R.layout.movie_list_layout;
             case TV_LIST:
-                viewHolder.onBind(viewHolder, new TvShowsViewModel(mContext, getItem(position)), position);
-                break;
+                return R.layout.tv_shows_list_layout;
             case PEOPLE_LIST:
-                viewHolder.onBind(viewHolder, new PeopleListViewModel(mContext, getItem(position)), position);
+                return R.layout.people_list_layout;
+            default:
                 break;
         }
+        return 0;
     }
 
     @Override
-    protected void bindFooterViewHolder(BaseViewHolder viewHolder, int position) {
+    protected int getFooterLayoutId() {
+        return 0;
+    }
 
+    @Override
+    protected Object getHeaderViewModel(int position) {
+        return null;
+    }
+
+    @Override
+    protected Object getItemViewModel(int position) {
+        switch (getItemViewType(position)) {
+            case MOVIE_TITLE:
+            case TV_TITLE:
+            case PEOPLE_TITLE:
+                return new MovieTitleViewModel(getItem(position));
+            case MOVIE_LIST:
+                return new MovieListViewModel(mContext, getItem(position));
+            case TV_LIST:
+                return new TvShowsViewModel(mContext, getItem(position));
+            case PEOPLE_LIST:
+                return new PeopleListViewModel(mContext, getItem(position));
+        }
+        return null;
+    }
+
+    @Override
+    protected Object getFooterViewModel(int position) {
+        return null;
     }
 
     @Override
@@ -132,8 +101,13 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
     }
 
     @Override
-    public int getItemViewType(int position) {
+    protected int getViewType(int position) {
         return getItem(position).getGetViewType();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 
     @Override
@@ -145,6 +119,6 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
 
     @Override
     public void onViewRecycled(BaseViewHolder viewHolder) {
-        viewHolder.onViewRecycled(viewHolder);
+        //viewHolder.onViewRecycled(viewHolder);
     }
 }

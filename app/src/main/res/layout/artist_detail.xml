@@ -5,7 +5,7 @@
     <data>
 
         <variable
-            name="cast"
+            name="obj"
             type="com.android.androiddatabinding.model.Cast" />
 
     </data>

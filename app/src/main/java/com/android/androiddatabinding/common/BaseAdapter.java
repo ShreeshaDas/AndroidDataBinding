@@ -1,21 +1,14 @@
 package com.android.androiddatabinding.common;
 
-import android.databinding.BindingAdapter;
-import android.support.v7.widget.RecyclerView;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-
-import com.android.androiddatabinding.R;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import android.util.SparseIntArray;
 
 import java.util.List;
 
 /**
- * Created by Shreesha on 16-07-2017.
+ * Created by Shreesha on 19-07-2017.
  */
 
-public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
 
 
     public static final int HEADER = 0;
@@ -38,82 +31,27 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
     protected List<T> items;
     protected boolean isFooterAdded = false;
 
-    protected abstract RecyclerView.ViewHolder createHeaderViewHolder(ViewGroup parent);
+    public BaseAdapter(List<T> items) {
+        this.items = items;
+    }
 
-    protected abstract RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent, int viewType);
+    protected abstract int getHeaderLayoutId();
 
-    protected abstract RecyclerView.ViewHolder createFooterViewHolder(ViewGroup parent);
+    protected abstract int getItemLayoutId(int position);
 
-    protected abstract void bindHeaderViewHolder(BaseViewHolder viewHolder, int position);
+    protected abstract int getFooterLayoutId();
 
-    protected abstract void bindItemViewHolder(BaseViewHolder viewHolder, int position);
+    protected abstract Object getHeaderViewModel(int position);
 
-    protected abstract void bindFooterViewHolder(BaseViewHolder viewHolder, int position);
+    protected abstract Object getItemViewModel(int position);
+
+    protected abstract Object getFooterViewModel(int position);
 
     protected abstract void displayLoadMoreFooter();
 
     protected abstract void displayErrorFooter();
 
     public abstract void addFooter();
-
-    public abstract void onViewRecycled(BaseViewHolder viewHolder);
-
-    public BaseAdapter(List<T> items) {
-        this.items = items;
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        RecyclerView.ViewHolder viewHolder = null;
-
-        switch (viewType) {
-            case HEADER:
-                viewHolder = createHeaderViewHolder(parent);
-                break;
-            case MOVIE_TITLE:
-            case MOVIE_LIST:
-            case TV_TITLE:
-            case TV_LIST:
-            case PEOPLE_TITLE:
-            case PEOPLE_LIST:
-            case MOVIE:
-            case TV:
-            case PEOPLE:
-                viewHolder = createItemViewHolder(parent, viewType);
-                break;
-            case FOOTER:
-                viewHolder = createFooterViewHolder(parent);
-                break;
-            default:
-                break;
-        }
-
-        return viewHolder;
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        switch (getItemViewType(position)) {
-            case HEADER:
-                bindHeaderViewHolder((BaseViewHolder) viewHolder, position);
-                break;
-            case MOVIE_TITLE:
-            case MOVIE_LIST:
-            case TV_TITLE:
-            case TV_LIST:
-            case PEOPLE_TITLE:
-            case PEOPLE_LIST:
-            case MOVIE:
-            case TV:
-            case PEOPLE:
-                bindItemViewHolder((BaseViewHolder) viewHolder, position);
-                break;
-            case FOOTER:
-                bindFooterViewHolder((BaseViewHolder) viewHolder, position);
-            default:
-                break;
-        }
-    }
 
     @Override
     public int getItemCount() {
@@ -184,8 +122,57 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
     }
 
     @Override
-    public void onViewRecycled(RecyclerView.ViewHolder holder) {
-        onViewRecycled((BaseViewHolder) holder);
-        super.onViewRecycled(holder);
+    protected int getLayoutIdForPosition(int position) {
+        switch (getViewType(position)) {
+            case HEADER:
+                return getHeaderLayoutId();
+            case MOVIE_TITLE:
+            case MOVIE_LIST:
+            case TV_TITLE:
+            case TV_LIST:
+            case PEOPLE_TITLE:
+            case PEOPLE_LIST:
+            case MOVIE:
+            case TV:
+            case PEOPLE:
+                return getItemLayoutId(position);
+            case FOOTER:
+                return getFooterLayoutId();
+            default:
+                break;
+        }
+        return 0;
+    }
+
+    @Override
+    protected Object getObjForPosition(int position) {
+        switch (getViewType(position)) {
+            case HEADER:
+                getHeaderViewModel(position);
+                break;
+            case MOVIE_TITLE:
+            case MOVIE_LIST:
+            case TV_TITLE:
+            case TV_LIST:
+            case PEOPLE_TITLE:
+            case PEOPLE_LIST:
+            case MOVIE:
+            case TV:
+            case PEOPLE:
+                getItemViewModel(position);
+                break;
+            case FOOTER:
+                getFooterViewModel(position);
+            default:
+                break;
+        }
+        return null;
+    }
+
+    protected abstract int getViewType(int position);
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 }
