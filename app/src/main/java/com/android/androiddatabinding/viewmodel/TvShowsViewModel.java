@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -54,9 +55,9 @@ public class TvShowsViewModel extends BaseViewModel {
     private TvAdapter mTvAdapter;
     private TvShowsListLayoutBinding mTvShowsListLayoutBinding;
 
-    public TvShowsViewModel(Context context, MediaCategory mediaCategory) {
+    public TvShowsViewModel(Context context, MediaCategory mediaCategory, ViewDataBinding viewDataBinding) {
         this.mMediaCategory = mediaCategory;
-        getBinding();
+        mTvShowsListLayoutBinding = (TvShowsListLayoutBinding) viewDataBinding;
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
@@ -91,8 +92,8 @@ public class TvShowsViewModel extends BaseViewModel {
     public void initAdapter() {
         if (mTvAdapter == null) {
             mTvAdapter = new TvAdapter(mContext, new ArrayList<Tvs>());
-            mTvShowsListLayoutBinding.movieList.setAdapter(mTvAdapter);
-            mTvShowsListLayoutBinding.movieList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+            mTvShowsListLayoutBinding.tvList.setAdapter(mTvAdapter);
+            mTvShowsListLayoutBinding.tvList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
         }
     }
 
@@ -122,7 +123,7 @@ public class TvShowsViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
-        RxBus.getInstance().send(mMediaCategory);
+        updateMovieAdapter();
     }
 
     public void getTvShows(String type, String mediaType) {
@@ -154,7 +155,7 @@ public class TvShowsViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
-        updateMovieAdapter(mMediaCategory);
+        updateMovieAdapter();
     }
 
     private void setTvShows(GenericResponse<ArrayList<Tvs>> tvShows) {
@@ -222,24 +223,11 @@ public class TvShowsViewModel extends BaseViewModel {
         mCompositeDisposable = null;
     }
 
-    public void handelScrollPosition(TvShowsListLayoutBinding tvShowsListLayoutBinding, SparseIntArray listPosition, int position) {
-        int lastSeenFirstPosition = listPosition.get(position, 0);
-        if (lastSeenFirstPosition >= 0) {
-            tvShowsListLayoutBinding.movieList.scrollToPosition(lastSeenFirstPosition);
+    private void updateMovieAdapter() {
+        if (mMediaCategory != null && mMediaCategory.getTvShows() != null && mMediaCategory.getTvShows().getResults().size() > 0) {
+            mTvAdapter.addAll(mMediaCategory.getTvShows().getResults());
         }
     }
 
-    private void updateMovieAdapter(MediaCategory mediaCategory) {
-        if (mediaCategory != null && mediaCategory.getTvShows() != null && mediaCategory.getTvShows().getResults().size() > 0) {
-            mTvAdapter.addAll(mediaCategory.getTvShows().getResults());
-        }
-    }
-
-    private void getBinding() {
-        LayoutInflater layoutInflater =
-                LayoutInflater.from(mContext);
-        View movieListView = layoutInflater.inflate(R.layout.people_list_layout, null, false);
-        mTvShowsListLayoutBinding = DataBindingUtil.getBinding(movieListView);
-    }
 
 }

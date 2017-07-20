@@ -4,7 +4,7 @@
     <data>
 
         <variable
-            name="obj"
+            name="movie"
             type="com.android.androiddatabinding.viewmodel.MovieViewModel" />
     </data>
 
@@ -26,7 +26,7 @@
                 android:id="@+id/movie_poster"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{obj.posterPath}" />
+                android:src="@{movie.posterPath}" />
 
         </android.support.v7.widget.CardView>
 
@@ -38,7 +38,7 @@
             android:maxLines="1"
             android:padding="10dp"
             android:textColor="@android:color/black"
-            android:text="@{obj.title}"
+            android:text="@{movie.title}"
             android:textSize="16dp" />
     </LinearLayout>
 </layout>

@@ -4,7 +4,7 @@
     <data>
 
         <variable
-            name="obj"
+            name="footer"
             type="com.android.androiddatabinding.viewmodel.FooterViewModel" />
     </data>
 

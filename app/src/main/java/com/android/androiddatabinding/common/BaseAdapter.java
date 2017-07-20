@@ -1,6 +1,6 @@
 package com.android.androiddatabinding.common;
 
-import android.util.SparseIntArray;
+import android.databinding.ViewDataBinding;
 
 import java.util.List;
 
@@ -37,13 +37,13 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
 
     protected abstract int getHeaderLayoutId();
 
-    protected abstract int getItemLayoutId(int position);
+    protected abstract int getItemLayoutId(int viewType);
 
     protected abstract int getFooterLayoutId();
 
     protected abstract Object getHeaderViewModel(int position);
 
-    protected abstract Object getItemViewModel(int position);
+    protected abstract Object getItemViewModel(ViewDataBinding viewDataBinding, int viewType, int position);
 
     protected abstract Object getFooterViewModel(int position);
 
@@ -122,7 +122,7 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
     }
 
     @Override
-    protected int getLayoutIdForPosition(int position) {
+    protected int getLayoutForViewTpe(int position) {
         switch (getViewType(position)) {
             case HEADER:
                 return getHeaderLayoutId();
@@ -135,7 +135,7 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
             case MOVIE:
             case TV:
             case PEOPLE:
-                return getItemLayoutId(position);
+                return getItemLayoutId(getViewType(position));
             case FOOTER:
                 return getFooterLayoutId();
             default:
@@ -145,11 +145,10 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
     }
 
     @Override
-    protected Object getObjForPosition(int position) {
+    protected Object getObjForPosition(ViewDataBinding viewDataBinding, int position) {
         switch (getViewType(position)) {
             case HEADER:
-                getHeaderViewModel(position);
-                break;
+                return getHeaderViewModel(position);
             case MOVIE_TITLE:
             case MOVIE_LIST:
             case TV_TITLE:
@@ -159,10 +158,9 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
             case MOVIE:
             case TV:
             case PEOPLE:
-                getItemViewModel(position);
-                break;
+                return getItemViewModel(viewDataBinding, getViewType(position), position);
             case FOOTER:
-                getFooterViewModel(position);
+                return getFooterViewModel(position);
             default:
                 break;
         }
@@ -171,8 +169,4 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
 
     protected abstract int getViewType(int position);
 
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
-    }
 }

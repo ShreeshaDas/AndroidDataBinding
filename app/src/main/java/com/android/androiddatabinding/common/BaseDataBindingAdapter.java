@@ -6,13 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 /**
  * Created by Shreesha on 16-07-2017.
  */
 
-public abstract class BaseDataBindingAdapter extends RecyclerView.Adapter<BaseViewHolder> {
+public abstract class BaseDataBindingAdapter<T> extends RecyclerView.Adapter<BaseViewHolder> {
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -24,18 +22,21 @@ public abstract class BaseDataBindingAdapter extends RecyclerView.Adapter<BaseVi
 
     @Override
     public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
-        Object obj = getObjForPosition(position);
-        viewHolder.bind(obj);
+        Object obj = getObjForPosition(viewHolder.getBinding(), position);
+        int variable = getVariableForPosition(position);
+        viewHolder.bind(variable, obj);
     }
 
 
     @Override
     public int getItemViewType(int position) {
-        return getLayoutIdForPosition(position);
+        return getLayoutForViewTpe(position);
     }
 
-    protected abstract Object getObjForPosition(int position);
+    protected abstract Object getObjForPosition(ViewDataBinding viewDataBinding, int position);
 
-    protected abstract int getLayoutIdForPosition(int position);
+    protected abstract int getVariableForPosition(int position);
+
+    protected abstract int getLayoutForViewTpe(int viewType);
 
 }

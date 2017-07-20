@@ -3,9 +3,8 @@
 <layout>
 
     <data>
-
         <variable
-            name="obj"
+            name="title"
             type="com.android.androiddatabinding.viewmodel.MovieTitleViewModel" />
     </data>
 
@@ -19,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#cccccc"
-            android:text="@{obj.mTitle}"
+            android:text="@{title.mTitle}"
             android:textSize="20dp" />
 
     </LinearLayout>

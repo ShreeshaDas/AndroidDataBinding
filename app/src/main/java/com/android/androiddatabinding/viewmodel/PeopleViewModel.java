@@ -1,6 +1,8 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
+import android.databinding.Bindable;
+import android.databinding.ViewDataBinding;
 
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.PeopleItemBinding;
@@ -18,13 +20,16 @@ public class PeopleViewModel extends BaseViewModel {
     private Context mContext;
     private String mPosterPath;
     private String mTitle;
+    private PeopleItemBinding mPeopleItemBinding;
 
-    public PeopleViewModel(Context context, PeopleList item) {
+    public PeopleViewModel(Context context, PeopleList item, ViewDataBinding viewDataBinding) {
         super();
         this.mContext = context;
         this.peopleList = item;
+        this.mPeopleItemBinding = (PeopleItemBinding) viewDataBinding;
     }
 
+    @Bindable
     public String getPosterPath() {
         return peopleList.getProfilePath();
     }
@@ -33,6 +38,7 @@ public class PeopleViewModel extends BaseViewModel {
         this.mPosterPath = posterPath;
     }
 
+    @Bindable
     public String getTitle() {
         return peopleList.getName();
     }

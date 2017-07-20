@@ -1,7 +1,10 @@
 package com.android.androiddatabinding.adapters;
 
 import android.content.Context;
+import android.databinding.ViewDataBinding;
+import android.support.v7.widget.RecyclerView;
 
+import com.android.androiddatabinding.BR;
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
@@ -32,7 +35,7 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
     }
 
     @Override
-    protected int getItemLayoutId(int position) {
+    protected int getItemLayoutId(int viewType) {
         return R.layout.movie_item;
     }
 
@@ -47,8 +50,8 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
     }
 
     @Override
-    protected Object getItemViewModel(int position) {
-        return new MovieViewModel(mContext, getItem(position));
+    protected Object getItemViewModel(ViewDataBinding viewDataBinding, int viewType, int position) {
+        return new MovieViewModel(mContext, getItem(position), viewDataBinding);
     }
 
     @Override
@@ -77,13 +80,10 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
         return (isLastPosition(position) && isFooterAdded) ? FOOTER : MOVIE;
     }
 
-    @Override
-    public void onViewRecycled(BaseViewHolder viewHolder) {
-
-    }
 
     @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+    protected int getVariableForPosition(int position) {
+        return BR.movie;
     }
+
 }

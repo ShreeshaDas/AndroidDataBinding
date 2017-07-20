@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,9 +56,9 @@ public class MovieListViewModel extends BaseViewModel {
     private MovieListLayoutBinding mMovieListLayoutBinding;
 
 
-    public MovieListViewModel(Context context, MediaCategory mediaCategory) {
+    public MovieListViewModel(Context context, MediaCategory mediaCategory, ViewDataBinding viewDataBinding) {
         this.mMediaCategory = mediaCategory;
-        getBinding(context);
+        mMovieListLayoutBinding = (MovieListLayoutBinding) viewDataBinding;
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
@@ -68,12 +69,6 @@ public class MovieListViewModel extends BaseViewModel {
         subscribe();
     }
 
-    private void getBinding(Context context) {
-        LayoutInflater layoutInflater =
-                LayoutInflater.from(context);
-        View movieListView = layoutInflater.inflate(R.layout.movie_list_layout, null, false);
-        mMovieListLayoutBinding = DataBindingUtil.getBinding(movieListView);
-    }
 
     private void initView() {
         mediaRecyclerView.set(View.VISIBLE);

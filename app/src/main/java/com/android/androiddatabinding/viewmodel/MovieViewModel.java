@@ -1,11 +1,9 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.databinding.Bindable;
+import android.databinding.ViewDataBinding;
 
-import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.MovieItemBinding;
 import com.android.androiddatabinding.model.Movie;
@@ -22,12 +20,13 @@ public class MovieViewModel extends BaseViewModel {
     private String mTitle;
     private MovieItemBinding mMovieItemBinding;
 
-    public MovieViewModel(Context context, Movie movie) {
+    public MovieViewModel(Context context, Movie movie, ViewDataBinding viewDataBinding) {
         this.mMovie = movie;
         this.mContext = context;
-        getBinding();
+        this.mMovieItemBinding = (MovieItemBinding) viewDataBinding;
     }
 
+    @Bindable
     public String getPosterPath() {
         return mMovie.getPosterPath();
     }
@@ -36,18 +35,12 @@ public class MovieViewModel extends BaseViewModel {
         this.mPosterPath = posterPath;
     }
 
+    @Bindable
     public String getTitle() {
         return mMovie.getTitle();
     }
 
     public void setTitle(String title) {
         this.mTitle = title;
-    }
-
-    private void getBinding() {
-        LayoutInflater layoutInflater =
-                LayoutInflater.from(mContext);
-        View movieListView = layoutInflater.inflate(R.layout.movie_item, null, false);
-        mMovieItemBinding = DataBindingUtil.getBinding(movieListView);
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -55,9 +56,9 @@ public class PeopleListViewModel extends BaseViewModel {
     private PeopleAdapter mPeopleAdapter;
     private PeopleListLayoutBinding mPeopleListLayoutBinding;
 
-    public PeopleListViewModel(Context context, MediaCategory mediaCategory) {
+    public PeopleListViewModel(Context context, MediaCategory mediaCategory, ViewDataBinding viewDataBinding) {
         this.mMediaCategory = mediaCategory;
-        getBinding();
+        this.mPeopleListLayoutBinding = (PeopleListLayoutBinding) viewDataBinding;
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_people_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
@@ -192,13 +193,13 @@ public class PeopleListViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setPeople(people);
-        RxBus.getInstance().send(mMediaCategory);
+        updateMovieAdapter();
     }
 
-    private void updateMovieAdapter(MediaCategory mediaCategory) {
-        if (mediaCategory != null && mediaCategory.getPeople() != null && mediaCategory.getPeople().getResults().size() > 0) {
-            if (mMediaCategory.equals(mediaCategory.getMediaCategory())) {
-                mPeopleAdapter.addAll(mediaCategory.getPeople().getResults());
+    private void updateMovieAdapter() {
+        if (mMediaCategory != null && mMediaCategory.getPeople() != null && mMediaCategory.getPeople().getResults().size() > 0) {
+            if (mMediaCategory.equals(mMediaCategory.getMediaCategory())) {
+                mPeopleAdapter.addAll(mMediaCategory.getPeople().getResults());
             }
         }
     }
@@ -231,13 +232,6 @@ public class PeopleListViewModel extends BaseViewModel {
     public void reset() {
         unSubscribeFromObservable();
         mCompositeDisposable = null;
-    }
-
-    private void getBinding() {
-        LayoutInflater layoutInflater =
-                LayoutInflater.from(mContext);
-        View movieListView = layoutInflater.inflate(R.layout.people_list_layout, null, false);
-        mPeopleListLayoutBinding = DataBindingUtil.getBinding(movieListView);
     }
 
     public void setPagination(Context context, PeopleListLayoutBinding peopleListLayoutBinding, PeopleListViewModel baseViewModel) {

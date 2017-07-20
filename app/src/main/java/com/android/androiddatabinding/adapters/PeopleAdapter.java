@@ -1,12 +1,15 @@
 package com.android.androiddatabinding.adapters;
 
 import android.content.Context;
+import android.databinding.ViewDataBinding;
+import android.support.v7.widget.RecyclerView;
 
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.model.PeopleList;
 import com.android.androiddatabinding.viewmodel.PeopleViewModel;
+import com.android.databinding.library.baseAdapters.BR;
 
 import java.util.ArrayList;
 
@@ -31,7 +34,7 @@ public class PeopleAdapter extends BaseAdapter<PeopleList> {
     }
 
     @Override
-    protected int getItemLayoutId(int position) {
+    protected int getItemLayoutId(int viewType) {
         return  R.layout.people_item;
     }
 
@@ -46,8 +49,8 @@ public class PeopleAdapter extends BaseAdapter<PeopleList> {
     }
 
     @Override
-    protected Object getItemViewModel(int position) {
-        return new PeopleViewModel(mContext, getItem(position));
+    protected Object getItemViewModel(ViewDataBinding viewDataBinding, int viewType, int position) {
+        return new PeopleViewModel(mContext, getItem(position), viewDataBinding);
     }
 
     @Override
@@ -76,12 +79,7 @@ public class PeopleAdapter extends BaseAdapter<PeopleList> {
     }
 
     @Override
-    public void onViewRecycled(BaseViewHolder viewHolder) {
-
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+    protected int getVariableForPosition(int position) {
+        return BR.people;
     }
 }
