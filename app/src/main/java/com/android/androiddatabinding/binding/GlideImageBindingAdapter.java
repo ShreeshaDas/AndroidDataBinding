@@ -1,4 +1,4 @@
-package com.android.androiddatabinding.common;
+package com.android.androiddatabinding.binding;
 
 import android.databinding.BindingAdapter;
 import android.text.TextUtils;
@@ -14,7 +14,7 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
  * Created by shreesha on 17/7/17.
  */
 
-public class GlideImageLoader {
+public class GlideImageBindingAdapter {
 
     @BindingAdapter({"android:src"})
     public static void setPeopleImageViewResource(ImageView imageView, String url) {

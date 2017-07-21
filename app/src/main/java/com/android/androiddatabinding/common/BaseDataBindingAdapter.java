@@ -33,10 +33,18 @@ public abstract class BaseDataBindingAdapter<T> extends RecyclerView.Adapter<Bas
         return getLayoutForViewTpe(position);
     }
 
+    @Override
+    public void onViewRecycled(BaseViewHolder holder) {
+        onVieItemRecycled(holder);
+        super.onViewRecycled(holder);
+    }
+
     protected abstract Object getObjForPosition(ViewDataBinding viewDataBinding, int position);
 
     protected abstract int getVariableForPosition(int position);
 
     protected abstract int getLayoutForViewTpe(int viewType);
+
+    protected abstract void onVieItemRecycled(BaseViewHolder holder);
 
 }

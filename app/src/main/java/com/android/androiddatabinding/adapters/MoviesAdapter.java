@@ -86,4 +86,9 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
         return BR.movie;
     }
 
+    @Override
+    protected void onVieItemRecycled(BaseViewHolder holder) {
+
+    }
+
 }

@@ -1,14 +1,11 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.util.SparseIntArray;
-import android.view.LayoutInflater;
 import android.view.View;
 
 import com.android.androiddatabinding.AndroidDataBindingApplication;
@@ -47,27 +44,33 @@ public class PeopleListViewModel extends BaseViewModel {
 
     private static final String TAG = PeopleListViewModel.class.getSimpleName();
 
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-    private MediaCategory mMediaCategory;
-    private Context mContext;
     public ObservableField<String> errorMessageLabel;
     public ObservableInt errorLabel;
     public ObservableInt mediaRecyclerView;
+
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private MediaCategory mMediaCategory;
+    private Context mContext;
     private PeopleAdapter mPeopleAdapter;
     private PeopleListLayoutBinding mPeopleListLayoutBinding;
+    private int mScrollPosition;
 
-    public PeopleListViewModel(Context context, MediaCategory mediaCategory, ViewDataBinding viewDataBinding) {
+    public PeopleListViewModel(Context context, MediaCategory mediaCategory,
+                               ViewDataBinding viewDataBinding, int scrollPosition) {
         this.mMediaCategory = mediaCategory;
         this.mPeopleListLayoutBinding = (PeopleListLayoutBinding) viewDataBinding;
+        this.mContext = context;
+        this.mScrollPosition = scrollPosition;
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_people_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
-        mContext = context;
         initView();
         initAdapter();
         getItemList();
         subscribe();
+        handelScrollPosition();
     }
+
 
     private void initView() {
         mediaRecyclerView.set(View.VISIBLE);
@@ -117,13 +120,6 @@ public class PeopleListViewModel extends BaseViewModel {
             } else {
                 setPeopleList(getPeople());
             }
-        }
-    }
-
-    public void handelScrollPosition(PeopleListLayoutBinding peopleListLayoutBinding, SparseIntArray listPosition, int position) {
-        int lastSeenFirstPosition = listPosition.get(position, 0);
-        if (lastSeenFirstPosition >= 0) {
-            peopleListLayoutBinding.movieList.scrollToPosition(lastSeenFirstPosition);
         }
     }
 
@@ -186,7 +182,6 @@ public class PeopleListViewModel extends BaseViewModel {
         errorLabel.set(View.VISIBLE);
         mediaRecyclerView.set(View.GONE);
         errorMessageLabel.set(mContext.getString(R.string.error_loading_people));
-        //RxBus.getInstance().send(mMediaCategory);
     }
 
     private void updateData(GenericResponse<ArrayList<PeopleList>> people) {
@@ -198,9 +193,7 @@ public class PeopleListViewModel extends BaseViewModel {
 
     private void updateMovieAdapter() {
         if (mMediaCategory != null && mMediaCategory.getPeople() != null && mMediaCategory.getPeople().getResults().size() > 0) {
-            if (mMediaCategory.equals(mMediaCategory.getMediaCategory())) {
-                mPeopleAdapter.addAll(mMediaCategory.getPeople().getResults());
-            }
+            mPeopleAdapter.addAll(mMediaCategory.getPeople().getResults());
         }
     }
 
@@ -234,7 +227,10 @@ public class PeopleListViewModel extends BaseViewModel {
         mCompositeDisposable = null;
     }
 
-    public void setPagination(Context context, PeopleListLayoutBinding peopleListLayoutBinding, PeopleListViewModel baseViewModel) {
 
+    private void handelScrollPosition() {
+        if(mScrollPosition > 0) {
+            mPeopleListLayoutBinding.movieList.scrollToPosition(mScrollPosition);
+        }
     }
 }

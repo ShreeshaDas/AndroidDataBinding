@@ -1,13 +1,11 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 
 import com.android.androiddatabinding.AndroidDataBindingApplication;
@@ -54,19 +52,23 @@ public class MovieListViewModel extends BaseViewModel {
     public ObservableInt mediaRecyclerView;
     private MoviesAdapter mMoviesAdapter;
     private MovieListLayoutBinding mMovieListLayoutBinding;
+    private int mScrollPosition;
 
 
-    public MovieListViewModel(Context context, MediaCategory mediaCategory, ViewDataBinding viewDataBinding) {
+    public MovieListViewModel(Context context, MediaCategory mediaCategory,
+                              ViewDataBinding viewDataBinding, int scrollPosition) {
         this.mMediaCategory = mediaCategory;
-        mMovieListLayoutBinding = (MovieListLayoutBinding) viewDataBinding;
+        this.mMovieListLayoutBinding = (MovieListLayoutBinding) viewDataBinding;
+        this.mContext = context;
+        this.mScrollPosition = scrollPosition;
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
-        mContext = context;
         initView();
         initAdapter();
         getItemList();
         subscribe();
+        handelScrollPosition();
     }
 
 
@@ -212,10 +214,6 @@ public class MovieListViewModel extends BaseViewModel {
         mCompositeDisposable = null;
     }
 
-    public void setPagination(Context context, MovieListLayoutBinding movieListLayoutBinding, MovieListViewModel baseViewModel) {
-
-    }
-
     public void initAdapter() {
         if (mMoviesAdapter == null) {
             mMoviesAdapter = new MoviesAdapter(mContext, new ArrayList<Movie>());
@@ -227,6 +225,12 @@ public class MovieListViewModel extends BaseViewModel {
     private void updateMovieAdapter(MediaCategory mediaCategory) {
         if (mediaCategory != null && mediaCategory.getMovies() != null && mediaCategory.getMovies().getResults().size() > 0) {
             mMoviesAdapter.addAll(mediaCategory.getMovies().getResults());
+        }
+    }
+
+    private void handelScrollPosition() {
+        if (mScrollPosition > 0) {
+            mMovieListLayoutBinding.movieList.scrollToPosition(mScrollPosition);
         }
     }
 

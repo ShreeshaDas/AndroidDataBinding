@@ -25,6 +25,8 @@ public class PeopleList {
     @SerializedName("adult")
     @Expose
     private Boolean adult;
+    public boolean mIsClicked;
+
 
     public Double getPopularity() {
         return popularity;
@@ -72,6 +74,14 @@ public class PeopleList {
 
     public void setAdult(Boolean adult) {
         this.adult = adult;
+    }
+
+    public boolean isClicked() {
+        return mIsClicked;
+    }
+
+    public void setIsClicked(boolean isClicked) {
+        this.mIsClicked = isClicked;
     }
 
 }

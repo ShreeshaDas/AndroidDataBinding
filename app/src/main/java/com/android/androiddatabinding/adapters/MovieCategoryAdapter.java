@@ -2,13 +2,19 @@ package com.android.androiddatabinding.adapters;
 
 import android.content.Context;
 import android.databinding.ViewDataBinding;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseIntArray;
 
 import com.android.androiddatabinding.BR;
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseAdapter;
+import com.android.androiddatabinding.common.BaseViewHolder;
+import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
+import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
+import com.android.androiddatabinding.databinding.TvShowsListLayoutBinding;
 import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.viewmodel.MovieListViewModel;
 import com.android.androiddatabinding.viewmodel.MovieTitleViewModel;
@@ -27,6 +33,7 @@ import java.util.List;
 public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
 
     private Context mContext;
+    private SparseIntArray listPosition = new SparseIntArray();
 
     public MovieCategoryAdapter(Context context, List<MediaCategory> items) {
         super(items);
@@ -75,11 +82,11 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
             case PEOPLE_TITLE:
                 return new MovieTitleViewModel(getItem(position), viewDataBinding);
             case MOVIE_LIST:
-                return new MovieListViewModel(mContext, getItem(position), viewDataBinding);
+                return new MovieListViewModel(mContext, getItem(position), viewDataBinding, listPosition.get(position, 0));
             case TV_LIST:
-                return new TvShowsViewModel(mContext, getItem(position), viewDataBinding);
+                return new TvShowsViewModel(mContext, getItem(position), viewDataBinding, listPosition.get(position, 0));
             case PEOPLE_LIST:
-                return new PeopleListViewModel(mContext, getItem(position), viewDataBinding);
+                return new PeopleListViewModel(mContext, getItem(position), viewDataBinding, listPosition.get(position, 0));
         }
         return null;
     }
@@ -105,6 +112,7 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
     protected int getViewType(int position) {
         return getItem(position).getGetViewType();
     }
+
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
@@ -133,5 +141,32 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
                 break;
         }
         return 0;
+    }
+
+    @Override
+    protected void onVieItemRecycled(BaseViewHolder holder) {
+        updateScrollPosition(holder);
+    }
+
+    private void updateScrollPosition(BaseViewHolder holder) {
+        final int position = holder.getAdapterPosition();
+
+        LinearLayoutManager layoutManager = null;
+        if (holder.getBinding() instanceof MovieListLayoutBinding) {
+            MovieListLayoutBinding movieListLayoutBinding = (MovieListLayoutBinding) holder.getBinding();
+            layoutManager = ((LinearLayoutManager) movieListLayoutBinding.movieList.getLayoutManager());
+        } else if (holder.getBinding() instanceof TvShowsListLayoutBinding) {
+            TvShowsListLayoutBinding tvShowsListLayoutBinding = (TvShowsListLayoutBinding) holder.getBinding();
+            layoutManager = ((LinearLayoutManager) tvShowsListLayoutBinding.tvList.getLayoutManager());
+        }
+        if (holder.getBinding() instanceof PeopleListLayoutBinding) {
+            PeopleListLayoutBinding peopleListLayoutBinding = (PeopleListLayoutBinding) holder.getBinding();
+            layoutManager = ((LinearLayoutManager) peopleListLayoutBinding.movieList.getLayoutManager());
+        }
+
+        if (layoutManager != null) {
+            int firstVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition();
+            listPosition.put(position, firstVisiblePosition);
+        }
     }
 }

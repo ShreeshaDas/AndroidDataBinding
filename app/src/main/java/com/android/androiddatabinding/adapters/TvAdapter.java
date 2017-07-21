@@ -35,7 +35,7 @@ public class TvAdapter extends BaseAdapter<Tvs> {
 
     @Override
     protected int getItemLayoutId(int viewType) {
-        return  R.layout.tv_item;
+        return R.layout.tv_item;
     }
 
     @Override
@@ -82,5 +82,10 @@ public class TvAdapter extends BaseAdapter<Tvs> {
     @Override
     protected int getVariableForPosition(int position) {
         return BR.tv;
+    }
+
+    @Override
+    protected void onVieItemRecycled(BaseViewHolder holder) {
+
     }
 }

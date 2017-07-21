@@ -82,4 +82,9 @@ public class PeopleAdapter extends BaseAdapter<PeopleList> {
     protected int getVariableForPosition(int position) {
         return BR.people;
     }
+
+    @Override
+    protected void onVieItemRecycled(BaseViewHolder holder) {
+
+    }
 }

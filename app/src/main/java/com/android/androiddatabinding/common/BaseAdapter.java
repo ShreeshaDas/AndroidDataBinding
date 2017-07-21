@@ -1,6 +1,7 @@
 package com.android.androiddatabinding.common;
 
 import android.databinding.ViewDataBinding;
+import android.support.v7.widget.RecyclerView;
 
 import java.util.List;
 
@@ -52,6 +53,9 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
     protected abstract void displayErrorFooter();
 
     public abstract void addFooter();
+
+    protected abstract int getViewType(int position);
+
 
     @Override
     public int getItemCount() {
@@ -166,7 +170,4 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
         }
         return null;
     }
-
-    protected abstract int getViewType(int position);
-
 }

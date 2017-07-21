@@ -1,14 +1,11 @@
 package com.android.androiddatabinding.viewmodel;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.util.SparseIntArray;
-import android.view.LayoutInflater;
 import android.view.View;
 
 import com.android.androiddatabinding.AndroidDataBindingApplication;
@@ -54,18 +51,22 @@ public class TvShowsViewModel extends BaseViewModel {
     public ObservableInt mediaRecyclerView;
     private TvAdapter mTvAdapter;
     private TvShowsListLayoutBinding mTvShowsListLayoutBinding;
+    private int mScrollPosition;
 
-    public TvShowsViewModel(Context context, MediaCategory mediaCategory, ViewDataBinding viewDataBinding) {
+    public TvShowsViewModel(Context context, MediaCategory mediaCategory,
+                            ViewDataBinding viewDataBinding, int scrollPosition) {
         this.mMediaCategory = mediaCategory;
+        this.mContext = context;
+        this.mScrollPosition = scrollPosition;
         mTvShowsListLayoutBinding = (TvShowsListLayoutBinding) viewDataBinding;
         errorMessageLabel = new ObservableField<>(context.getString(R.string.default_error_message));
         errorLabel = new ObservableInt(View.GONE);
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
-        mContext = context;
         initView();
         initAdapter();
         getItemList();
         subscribe();
+        handelScrollPosition();
     }
 
     public void initView() {
@@ -131,19 +132,28 @@ public class TvShowsViewModel extends BaseViewModel {
         Disposable disposable = new TvFetcher().getTvsList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GenericResponse<ArrayList<Tvs>>>() {
-                    @Override
-                    public void accept(GenericResponse<ArrayList<Tvs>> tvResponse) throws Exception {
-                        updateTvShowsList(tvResponse);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        handelGetMoviesErrorCase(throwable);
-                    }
-                });
+                .subscribe(getMovieListSuccess(), getMovieListFailure());
         mCompositeDisposable.add(disposable);
     }
+
+    private Consumer<? super Throwable> getMovieListFailure() {
+        return new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                handelGetMoviesErrorCase(throwable);
+            }
+        };
+    }
+
+    private Consumer<? super GenericResponse<ArrayList<Tvs>>> getMovieListSuccess() {
+        return new Consumer<GenericResponse<ArrayList<Tvs>>>() {
+            @Override
+            public void accept(GenericResponse<ArrayList<Tvs>> tvResponse) throws Exception {
+                updateTvShowsList(tvResponse);
+            }
+        };
+    }
+
 
     private void updateTvShowsList(GenericResponse<ArrayList<Tvs>> tv) {
         if (tv != null && tv.getResults() != null && tv.getResults().size() > 0) {
@@ -226,6 +236,12 @@ public class TvShowsViewModel extends BaseViewModel {
     private void updateMovieAdapter() {
         if (mMediaCategory != null && mMediaCategory.getTvShows() != null && mMediaCategory.getTvShows().getResults().size() > 0) {
             mTvAdapter.addAll(mMediaCategory.getTvShows().getResults());
+        }
+    }
+
+    private void handelScrollPosition() {
+        if (mScrollPosition > 0) {
+            mTvShowsListLayoutBinding.tvList.scrollToPosition(mScrollPosition);
         }
     }
 
