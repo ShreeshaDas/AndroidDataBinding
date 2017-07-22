@@ -5,9 +5,12 @@ import android.databinding.Bindable;
 import android.databinding.ViewDataBinding;
 import android.view.View;
 
+import com.android.androiddatabinding.bus.RxBus;
+import com.android.androiddatabinding.bus.events.KnowMoreClickEvent;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.databinding.PeopleItemBinding;
-import com.android.androiddatabinding.model.PeopleList;
+import com.android.androiddatabinding.model.People;
+import com.android.databinding.library.baseAdapters.BR;
 
 /**
  * Created by shreesha on 17/7/17.
@@ -15,22 +18,22 @@ import com.android.androiddatabinding.model.PeopleList;
 
 public class PeopleViewModel extends BaseViewModel {
 
-    private PeopleList peopleList;
+    private People people;
     private Context mContext;
     private String mPosterPath;
     private String mTitle;
     private PeopleItemBinding mPeopleItemBinding;
 
-    public PeopleViewModel(Context context, PeopleList item, ViewDataBinding viewDataBinding) {
+    public PeopleViewModel(Context context, People item, ViewDataBinding viewDataBinding) {
         super();
         this.mContext = context;
-        this.peopleList = item;
+        this.people = item;
         this.mPeopleItemBinding = (PeopleItemBinding) viewDataBinding;
     }
 
     @Bindable
     public String getPosterPath() {
-        return peopleList.getProfilePath();
+        return people.getProfilePath();
     }
 
     public void setPosterPath(String posterPath) {
@@ -39,7 +42,7 @@ public class PeopleViewModel extends BaseViewModel {
 
     @Bindable
     public String getTitle() {
-        return peopleList.getName();
+        return people.getName();
     }
 
     public void setTitle(String title) {
@@ -48,12 +51,13 @@ public class PeopleViewModel extends BaseViewModel {
 
     @Bindable
     public boolean isClicked() {
-        return peopleList.isClicked();
+        return people.isClicked();
     }
 
     public void setIsClicked(boolean isClicked) {
-        peopleList.setIsClicked(isClicked);
+        people.setIsClicked(isClicked);
         notifyChange();
+        RxBus.getInstance().send(new KnowMoreClickEvent(people));
     }
 
     public void onKnowMoreClick(View view) {

@@ -12,7 +12,7 @@ public class MediaCategory {
     private String mCategoryTitle;
     private GenericResponse<ArrayList<Movie>> mMovies;
     private GenericResponse<ArrayList<Tvs>> mTv;
-    private GenericResponse<ArrayList<PeopleList>> mPeople;
+    private GenericResponse<ArrayList<People>> mPeople;
     private String mQueryType;
     private String mMediaType;
     private NetworkError mNetworkError;
@@ -81,11 +81,11 @@ public class MediaCategory {
         this.mTv = tvsGenericResponse;
     }
 
-    public GenericResponse<ArrayList<PeopleList>> getPeople() {
+    public GenericResponse<ArrayList<People>> getPeople() {
         return mPeople;
     }
 
-    public void setPeople(GenericResponse<ArrayList<PeopleList>> peopleGenericResponse) {
+    public void setPeople(GenericResponse<ArrayList<People>> peopleGenericResponse) {
         this.mPeople = peopleGenericResponse;
     }
 

@@ -151,4 +151,20 @@ public class Tvs {
         this.originCountry = originCountry;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj instanceof Tvs) {
+            if (this.getId() == null) return false;
+            if (((Tvs) obj).getId() == null) return false;
+            if (this.getId().equals(((Tvs) obj).getId())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
 }

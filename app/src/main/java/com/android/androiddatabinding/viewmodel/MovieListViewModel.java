@@ -7,6 +7,7 @@ import android.databinding.ViewDataBinding;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.androiddatabinding.AndroidDataBindingApplication;
 import com.android.androiddatabinding.R;
@@ -14,6 +15,7 @@ import com.android.androiddatabinding.adapters.MoviesAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
+import com.android.androiddatabinding.common.OnItemClickListener;
 import com.android.androiddatabinding.data.fetcher.MoviesFetcher;
 import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
 import com.android.androiddatabinding.internal.Constants;
@@ -40,7 +42,7 @@ import retrofit2.HttpException;
  * Created by shreesha on 12/7/17.
  */
 
-public class MovieListViewModel extends BaseViewModel {
+public class MovieListViewModel extends BaseViewModel implements OnItemClickListener<Movie> {
 
     private static final String TAG = MovieListViewModel.class.getSimpleName();
 
@@ -66,9 +68,14 @@ public class MovieListViewModel extends BaseViewModel {
         mediaRecyclerView = new ObservableInt(View.VISIBLE);
         initView();
         initAdapter();
+        initAdapterItemClickListener();
         getItemList();
         subscribe();
         handelScrollPosition();
+    }
+
+    private void initAdapterItemClickListener() {
+        mMoviesAdapter.setOnItemClickListener(this);
     }
 
 
@@ -234,4 +241,8 @@ public class MovieListViewModel extends BaseViewModel {
         }
     }
 
+    @Override
+    public void onItemClick(int position, Movie item) {
+        Toast.makeText(mContext, item.getTitle(), Toast.LENGTH_LONG).show();
+    }
 }

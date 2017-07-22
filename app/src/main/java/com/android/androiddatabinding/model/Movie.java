@@ -166,6 +166,22 @@ public class Movie {
         this.voteAverage = voteAverage;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj instanceof Movie) {
+            if (this.getId() == null) return false;
+            if (((Movie) obj).getId() == null) return false;
+            if (this.getId().equals(((Movie) obj).getId())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
 }
 
 

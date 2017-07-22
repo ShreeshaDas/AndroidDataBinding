@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by shreesha on 18/7/17.
  */
 
-public class GenericResponse<T>  {
+public class GenericResponse<T> {
 
     @SerializedName("page")
     @Expose
@@ -54,5 +54,10 @@ public class GenericResponse<T>  {
 
     public void setResults(T results) {
         this.results = results;
+    }
+
+    public boolean hasNextPage() {
+        if (getPage() < getTotalPages()) return true;
+        return false;
     }
 }

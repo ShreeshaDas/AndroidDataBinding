@@ -2,10 +2,11 @@
 package com.android.androiddatabinding.model;
 
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class PeopleList {
+public class People {
 
     @SerializedName("popularity")
     @Expose
@@ -84,4 +85,19 @@ public class PeopleList {
         this.mIsClicked = isClicked;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj instanceof People) {
+            if (this.getId() == null) return false;
+            if (((People) obj).getId() == null) return false;
+            if (this.getId().equals(((People) obj).getId())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

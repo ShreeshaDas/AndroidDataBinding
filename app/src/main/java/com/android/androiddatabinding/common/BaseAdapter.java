@@ -77,6 +77,12 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
         }
     }
 
+    public void updateAll(List<T> items) {
+       if(items != null) {
+           items.addAll(items);
+       }
+    }
+
     private void remove(T item) {
         int position = items.indexOf(item);
         if (position > -1) {
@@ -90,6 +96,10 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
         while (getItemCount() > 0) {
             remove(getItem(0));
         }
+    }
+
+    public List<T> getData() {
+        return items;
     }
 
     public boolean isEmpty() {
@@ -169,5 +179,10 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
                 break;
         }
         return null;
+    }
+
+    @Override
+    protected Object getItemForPosition(int position) {
+        return items.get(position);
     }
 }

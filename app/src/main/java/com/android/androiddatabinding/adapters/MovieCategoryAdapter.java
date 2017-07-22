@@ -158,8 +158,7 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
         } else if (holder.getBinding() instanceof TvShowsListLayoutBinding) {
             TvShowsListLayoutBinding tvShowsListLayoutBinding = (TvShowsListLayoutBinding) holder.getBinding();
             layoutManager = ((LinearLayoutManager) tvShowsListLayoutBinding.tvList.getLayoutManager());
-        }
-        if (holder.getBinding() instanceof PeopleListLayoutBinding) {
+        } else if (holder.getBinding() instanceof PeopleListLayoutBinding) {
             PeopleListLayoutBinding peopleListLayoutBinding = (PeopleListLayoutBinding) holder.getBinding();
             layoutManager = ((LinearLayoutManager) peopleListLayoutBinding.movieList.getLayoutManager());
         }

@@ -2,12 +2,12 @@ package com.android.androiddatabinding.adapters;
 
 import android.content.Context;
 import android.databinding.ViewDataBinding;
-import android.support.v7.widget.RecyclerView;
 
 import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
-import com.android.androiddatabinding.model.PeopleList;
+import com.android.androiddatabinding.model.People;
+import com.android.androiddatabinding.viewmodel.FooterViewModel;
 import com.android.androiddatabinding.viewmodel.PeopleViewModel;
 import com.android.databinding.library.baseAdapters.BR;
 
@@ -17,14 +17,14 @@ import java.util.ArrayList;
  * Created by shreesha on 14/2/17.
  */
 
-public class PeopleAdapter extends BaseAdapter<PeopleList> {
+public class PeopleAdapter extends BaseAdapter<People> {
 
-    private ArrayList<PeopleList> peopleList;
+    private ArrayList<People> people;
     private Context mContext;
 
-    public PeopleAdapter(Context context, ArrayList<PeopleList> peopleList) {
-        super(peopleList);
-        this.peopleList = peopleList;
+    public PeopleAdapter(Context context, ArrayList<People> people) {
+        super(people);
+        this.people = people;
         this.mContext = context;
     }
 
@@ -35,12 +35,12 @@ public class PeopleAdapter extends BaseAdapter<PeopleList> {
 
     @Override
     protected int getItemLayoutId(int viewType) {
-        return  R.layout.people_item;
+        return R.layout.people_item;
     }
 
     @Override
     protected int getFooterLayoutId() {
-        return 0;
+        return R.layout.footer_item;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PeopleAdapter extends BaseAdapter<PeopleList> {
 
     @Override
     protected Object getFooterViewModel(int position) {
-        return null;
+        return new FooterViewModel();
     }
 
     @Override
@@ -70,17 +70,18 @@ public class PeopleAdapter extends BaseAdapter<PeopleList> {
 
     @Override
     public void addFooter() {
-
+        isFooterAdded = true;
+        add(new People());
     }
 
     @Override
     protected int getViewType(int position) {
-        return PEOPLE;
+        return (isLastPosition(position) && isFooterAdded) ? FOOTER : PEOPLE;
     }
 
     @Override
     protected int getVariableForPosition(int position) {
-        return BR.people;
+        return (isLastPosition(position) && isFooterAdded) ? com.android.androiddatabinding.BR.footer : BR.people;
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.android.androiddatabinding.data.fetcher;
 
 import com.android.androiddatabinding.data.response.PeopleApiCall;
 import com.android.androiddatabinding.model.GenericResponse;
-import com.android.androiddatabinding.model.PeopleList;
+import com.android.androiddatabinding.model.People;
 
 import java.util.ArrayList;
 
@@ -14,7 +14,7 @@ import retrofit2.Retrofit;
  */
 
 public class PeopleFetcher {
-    public Observable<GenericResponse<ArrayList<PeopleList>>> getPeopleList(Retrofit retrofit, String mediaType, String type, String apiKey, int page) {
+    public Observable<GenericResponse<ArrayList<People>>> getPeopleList(Retrofit retrofit, String mediaType, String type, String apiKey, int page) {
         PeopleApiCall nowPlayingMovieApiCall = retrofit.create(PeopleApiCall.class);
         return nowPlayingMovieApiCall.getPeople(mediaType, type, apiKey, page);
     }

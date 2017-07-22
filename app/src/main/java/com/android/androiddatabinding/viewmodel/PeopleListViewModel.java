@@ -13,6 +13,7 @@ import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.adapters.PeopleAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
+import com.android.androiddatabinding.bus.events.KnowMoreClickEvent;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.data.fetcher.PeopleFetcher;
 import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
@@ -20,7 +21,7 @@ import com.android.androiddatabinding.internal.Constants;
 import com.android.androiddatabinding.model.GenericResponse;
 import com.android.androiddatabinding.model.MediaCategory;
 import com.android.androiddatabinding.model.NetworkError;
-import com.android.androiddatabinding.model.PeopleList;
+import com.android.androiddatabinding.model.People;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -81,11 +82,11 @@ public class PeopleListViewModel extends BaseViewModel {
         return mMediaCategory.getMediaCategory();
     }
 
-    public GenericResponse<ArrayList<PeopleList>> getPeople() {
+    public GenericResponse<ArrayList<People>> getPeople() {
         return mMediaCategory.getPeople();
     }
 
-    public void setPeople(GenericResponse<ArrayList<PeopleList>> peopleLists) {
+    public void setPeople(GenericResponse<ArrayList<People>> peopleLists) {
         this.mMediaCategory.setPeople(peopleLists);
     }
 
@@ -100,7 +101,7 @@ public class PeopleListViewModel extends BaseViewModel {
 
     public void initAdapter() {
         if (mPeopleAdapter == null) {
-            mPeopleAdapter = new PeopleAdapter(mContext, new ArrayList<PeopleList>());
+            mPeopleAdapter = new PeopleAdapter(mContext, new ArrayList<People>());
             mPeopleListLayoutBinding.movieList.setAdapter(mPeopleAdapter);
             mPeopleListLayoutBinding.movieList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
         }
@@ -123,7 +124,7 @@ public class PeopleListViewModel extends BaseViewModel {
         }
     }
 
-    private void setPeopleList(GenericResponse<ArrayList<PeopleList>> peopleList) {
+    private void setPeopleList(GenericResponse<ArrayList<People>> peopleList) {
         updateData(peopleList);
     }
 
@@ -133,9 +134,9 @@ public class PeopleListViewModel extends BaseViewModel {
         Disposable disposable = new PeopleFetcher().getPeopleList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GenericResponse<ArrayList<PeopleList>>>() {
+                .subscribe(new Consumer<GenericResponse<ArrayList<People>>>() {
                     @Override
-                    public void accept(GenericResponse<ArrayList<PeopleList>> people) throws Exception {
+                    public void accept(GenericResponse<ArrayList<People>> people) throws Exception {
                         updatePeopleList(people);
                     }
                 }, new Consumer<Throwable>() {
@@ -172,7 +173,7 @@ public class PeopleListViewModel extends BaseViewModel {
         showError();
     }
 
-    private void updatePeopleList(GenericResponse<ArrayList<PeopleList>> people) {
+    private void updatePeopleList(GenericResponse<ArrayList<People>> people) {
         if (people != null && people.getResults() != null && people.getResults().size() > 0) {
             updateData(people);
         }
@@ -184,16 +185,27 @@ public class PeopleListViewModel extends BaseViewModel {
         errorMessageLabel.set(mContext.getString(R.string.error_loading_people));
     }
 
-    private void updateData(GenericResponse<ArrayList<PeopleList>> people) {
+    private void updateData(GenericResponse<ArrayList<People>> people) {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setPeople(people);
-        updateMovieAdapter();
+        setDataToMovieAdapter();
     }
 
-    private void updateMovieAdapter() {
+    private void setDataToMovieAdapter() {
         if (mMediaCategory != null && mMediaCategory.getPeople() != null && mMediaCategory.getPeople().getResults().size() > 0) {
             mPeopleAdapter.addAll(mMediaCategory.getPeople().getResults());
+            if (mMediaCategory.getPeople().hasNextPage()) {
+                mPeopleAdapter.addFooter();
+            } else {
+                mPeopleAdapter.removeFooter();
+            }
+        }
+    }
+
+    private void updateDataToMovieAdapter() {
+        if (mMediaCategory != null && mMediaCategory.getPeople() != null && mMediaCategory.getPeople().getResults().size() > 0) {
+            mPeopleAdapter.updateAll(mMediaCategory.getPeople().getResults());
         }
     }
 
@@ -209,6 +221,13 @@ public class PeopleListViewModel extends BaseViewModel {
                                     reset();
                                     break;
                             }
+                        } else if (o instanceof KnowMoreClickEvent) {
+                            KnowMoreClickEvent knowMoreClickEvent = (KnowMoreClickEvent) o;
+                            People people = knowMoreClickEvent.getPeople();
+                            int itemPosition = mPeopleAdapter.getData().indexOf(people);
+                            getPeople().getResults().set(itemPosition, people);
+                            setPeople(getPeople());
+                            updateDataToMovieAdapter();
                         }
                     }
                 });
@@ -229,7 +248,7 @@ public class PeopleListViewModel extends BaseViewModel {
 
 
     private void handelScrollPosition() {
-        if(mScrollPosition > 0) {
+        if (mScrollPosition > 0) {
             mPeopleListLayoutBinding.movieList.scrollToPosition(mScrollPosition);
         }
     }
