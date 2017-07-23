@@ -14,9 +14,26 @@
         android:orientation="vertical">
 
         <ProgressBar
+            android:id="@+id/loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/rotate"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/retry"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/error"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/error"
+            android:visibility="gone" />
 
     </RelativeLayout>
 </layout>

@@ -38,7 +38,11 @@ public class MediaCategory {
     }
 
     public void setMovies(GenericResponse<ArrayList<Movie>> movieGenericResponse) {
-        this.mMovies = movieGenericResponse;
+        if (this.mMovies == null) {
+            this.mMovies = movieGenericResponse;
+        } else {
+            this.mMovies.getResults().addAll(movieGenericResponse.getResults());
+        }
     }
 
     public String getQueryType() {
@@ -78,7 +82,11 @@ public class MediaCategory {
     }
 
     public void setTv(GenericResponse<ArrayList<Tvs>> tvsGenericResponse) {
-        this.mTv = tvsGenericResponse;
+        if (this.mTv == null) {
+            this.mTv = tvsGenericResponse;
+        } else {
+            this.mTv.getResults().addAll(tvsGenericResponse.getResults());
+        }
     }
 
     public GenericResponse<ArrayList<People>> getPeople() {
@@ -86,7 +94,12 @@ public class MediaCategory {
     }
 
     public void setPeople(GenericResponse<ArrayList<People>> peopleGenericResponse) {
-        this.mPeople = peopleGenericResponse;
+        if (this.mPeople == null) {
+            this.mPeople = peopleGenericResponse;
+        } else {
+            this.mPeople.getResults().addAll(peopleGenericResponse.getResults());
+        }
+
     }
 
 

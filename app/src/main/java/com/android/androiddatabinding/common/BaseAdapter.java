@@ -26,7 +26,8 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
 
     public enum FooterType {
         LOAD_MORE,
-        ERROR
+        ERROR,
+        RETRY
     }
 
     protected List<T> items;
@@ -46,11 +47,13 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
 
     protected abstract Object getItemViewModel(ViewDataBinding viewDataBinding, int viewType, int position);
 
-    protected abstract Object getFooterViewModel(int position);
+    protected abstract Object getFooterViewModel(ViewDataBinding viewDataBinding, int position);
 
     protected abstract void displayLoadMoreFooter();
 
     protected abstract void displayErrorFooter();
+
+    protected abstract void displayRetryFooter();
 
     public abstract void addFooter();
 
@@ -72,15 +75,16 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
     }
 
     public void addAll(List<T> items) {
-        for (T item : items) {
-            add(item);
+        if (isFooterAdded) {
+            removeFooter();
         }
+        this.items.addAll(items);
     }
 
     public void updateAll(List<T> items) {
-       if(items != null) {
-           items.addAll(items);
-       }
+        if (items != null) {
+            items.addAll(items);
+        }
     }
 
     private void remove(T item) {
@@ -130,6 +134,8 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
             case ERROR:
                 displayErrorFooter();
                 break;
+            case RETRY:
+                displayRetryFooter();
             default:
                 break;
         }
@@ -174,7 +180,7 @@ public abstract class BaseAdapter<T> extends BaseDataBindingAdapter {
             case PEOPLE:
                 return getItemViewModel(viewDataBinding, getViewType(position), position);
             case FOOTER:
-                return getFooterViewModel(position);
+                return getFooterViewModel(viewDataBinding, position);
             default:
                 break;
         }

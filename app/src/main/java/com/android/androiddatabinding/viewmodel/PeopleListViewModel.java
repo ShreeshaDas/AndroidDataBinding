@@ -15,6 +15,7 @@ import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.bus.events.KnowMoreClickEvent;
 import com.android.androiddatabinding.common.BaseViewModel;
+import com.android.androiddatabinding.custom.EndlessRecyclerOnScrollListener;
 import com.android.androiddatabinding.data.fetcher.PeopleFetcher;
 import com.android.androiddatabinding.databinding.PeopleListLayoutBinding;
 import com.android.androiddatabinding.internal.Constants;
@@ -55,6 +56,7 @@ public class PeopleListViewModel extends BaseViewModel {
     private PeopleAdapter mPeopleAdapter;
     private PeopleListLayoutBinding mPeopleListLayoutBinding;
     private int mScrollPosition;
+    private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener;
 
     public PeopleListViewModel(Context context, MediaCategory mediaCategory,
                                ViewDataBinding viewDataBinding, int scrollPosition) {
@@ -70,6 +72,7 @@ public class PeopleListViewModel extends BaseViewModel {
         getItemList();
         subscribe();
         handelScrollPosition();
+        initPagination();
     }
 
 
@@ -77,6 +80,17 @@ public class PeopleListViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
     }
+
+    private void initPagination() {
+        mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager) mPeopleListLayoutBinding.movieList.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int current_page) {
+                getPeople(getQueryType(), getMediaType(), 1);
+            }
+        };
+        mPeopleListLayoutBinding.movieList.addOnScrollListener(mEndlessRecyclerOnScrollListener);
+    }
+
 
     public String getCategoryTitle() {
         return mMediaCategory.getMediaCategory();
@@ -109,14 +123,14 @@ public class PeopleListViewModel extends BaseViewModel {
 
     public void getItemList() {
         if (getPeople() == null) {
-            getPeople(getQueryType(), getMediaType());
+            getPeople(getQueryType(), getMediaType(), 1);
         } else {
             if (getPeople() != null && getPeople().getResults().size() == 0) {
                 if (mMediaCategory.getNetworkError() != null) {
                     showError();
                 } else {
                     Log.d(TAG, getCategoryTitle() + " " + getQueryType());
-                    getPeople(getQueryType(), getMediaType());
+                    getPeople(getQueryType(), getMediaType(), 1);
                 }
             } else {
                 setPeopleList(getPeople());
@@ -129,9 +143,9 @@ public class PeopleListViewModel extends BaseViewModel {
     }
 
 
-    private void getPeople(String type, String mediaType) {
+    private void getPeople(String type, String mediaType, int page) {
         AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(mContext);
-        Disposable disposable = new PeopleFetcher().getPeopleList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
+        Disposable disposable = new PeopleFetcher().getPeopleList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, page)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<GenericResponse<ArrayList<People>>>() {
@@ -189,13 +203,13 @@ public class PeopleListViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setPeople(people);
-        setDataToMovieAdapter();
+        setDataToPeopleAdapter(people);
     }
 
-    private void setDataToMovieAdapter() {
-        if (mMediaCategory != null && mMediaCategory.getPeople() != null && mMediaCategory.getPeople().getResults().size() > 0) {
-            mPeopleAdapter.addAll(mMediaCategory.getPeople().getResults());
-            if (mMediaCategory.getPeople().hasNextPage()) {
+    private void setDataToPeopleAdapter(GenericResponse<ArrayList<People>> people) {
+        if (people != null && people.getResults() != null && people.getResults().size() > 0) {
+            mPeopleAdapter.addAll(people.getResults());
+            if (people.hasNextPage()) {
                 mPeopleAdapter.addFooter();
             } else {
                 mPeopleAdapter.removeFooter();

@@ -92,7 +92,7 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
     }
 
     @Override
-    protected Object getFooterViewModel(int position) {
+    protected Object getFooterViewModel(ViewDataBinding viewDataBinding, int position) {
         return null;
     }
 
@@ -102,6 +102,11 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
 
     @Override
     protected void displayErrorFooter() {
+    }
+
+    @Override
+    protected void displayRetryFooter() {
+
     }
 
     @Override
@@ -164,7 +169,7 @@ public class MovieCategoryAdapter extends BaseAdapter<MediaCategory> {
         }
 
         if (layoutManager != null) {
-            int firstVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition();
+            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
             listPosition.put(position, firstVisiblePosition);
         }
     }

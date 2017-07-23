@@ -9,6 +9,7 @@ import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewHolder;
 import com.android.androiddatabinding.model.Tvs;
+import com.android.androiddatabinding.viewmodel.FooterViewModel;
 import com.android.androiddatabinding.viewmodel.TvViewModel;
 
 import java.util.ArrayList;
@@ -54,8 +55,8 @@ public class TvAdapter extends BaseAdapter<Tvs> {
     }
 
     @Override
-    protected Object getFooterViewModel(int position) {
-        return null;
+    protected Object getFooterViewModel(ViewDataBinding viewDataBinding, int position) {
+        return new FooterViewModel(viewDataBinding);
     }
 
     @Override
@@ -65,6 +66,11 @@ public class TvAdapter extends BaseAdapter<Tvs> {
 
     @Override
     protected void displayErrorFooter() {
+
+    }
+
+    @Override
+    protected void displayRetryFooter() {
 
     }
 

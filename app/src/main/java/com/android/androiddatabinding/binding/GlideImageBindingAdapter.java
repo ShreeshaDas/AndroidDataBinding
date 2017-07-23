@@ -20,11 +20,19 @@ public class GlideImageBindingAdapter {
     public static void setPeopleImageViewResource(ImageView imageView, String url) {
         switch (imageView.getId()) {
             case R.id.movie_poster:
-                Glide.with(imageView.getContext())
-                        .load("https://image.tmdb.org/t/p/w500" + url)
-                        .apply(RequestOptions.centerCropTransform())
-                        .transition(withCrossFade())
-                        .into(imageView);
+                if (!TextUtils.isEmpty(url)) {
+                    Glide.with(imageView.getContext())
+                            .load("https://image.tmdb.org/t/p/w500" + url)
+                            .apply(RequestOptions.centerCropTransform())
+                            .transition(withCrossFade())
+                            .into(imageView);
+                } else {
+                    Glide.with(imageView.getContext())
+                            .load(R.drawable.movie_placeholder)
+                            .apply(RequestOptions.centerCropTransform())
+                            .transition(withCrossFade())
+                            .into(imageView);
+                }
                 break;
             case R.id.tv_poster:
                 Glide.with(imageView.getContext())

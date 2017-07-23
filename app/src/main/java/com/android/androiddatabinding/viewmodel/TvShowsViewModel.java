@@ -14,6 +14,7 @@ import com.android.androiddatabinding.adapters.TvAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
 import com.android.androiddatabinding.common.BaseViewModel;
+import com.android.androiddatabinding.custom.EndlessRecyclerOnScrollListener;
 import com.android.androiddatabinding.data.fetcher.TvFetcher;
 import com.android.androiddatabinding.databinding.TvShowsListLayoutBinding;
 import com.android.androiddatabinding.internal.Constants;
@@ -52,6 +53,7 @@ public class TvShowsViewModel extends BaseViewModel {
     private TvAdapter mTvAdapter;
     private TvShowsListLayoutBinding mTvShowsListLayoutBinding;
     private int mScrollPosition;
+    private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener;
 
     public TvShowsViewModel(Context context, MediaCategory mediaCategory,
                             ViewDataBinding viewDataBinding, int scrollPosition) {
@@ -67,6 +69,7 @@ public class TvShowsViewModel extends BaseViewModel {
         getItemList();
         subscribe();
         handelScrollPosition();
+        initPagination();
     }
 
     public void initView() {
@@ -98,17 +101,27 @@ public class TvShowsViewModel extends BaseViewModel {
         }
     }
 
+    private void initPagination() {
+        mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager) mTvShowsListLayoutBinding.tvList.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int current_page) {
+                getTvShows(getQueryType(), getMediaType(), 1);
+            }
+        };
+        mTvShowsListLayoutBinding.tvList.addOnScrollListener(mEndlessRecyclerOnScrollListener);
+    }
+
 
     public void getItemList() {
         if (getTvShows() == null) {
-            getTvShows(getQueryType(), getMediaType());
+            getTvShows(getQueryType(), getMediaType(), 1);
         } else {
             if (getTvShows() != null && getTvShows().getResults().size() == 0) {
                 if (mMediaCategory.getNetworkError() != null) {
                     showError();
                 } else {
                     Log.d(TAG, getCategoryTitle() + " " + getQueryType());
-                    getTvShows(getQueryType(), getMediaType());
+                    getTvShows(getQueryType(), getMediaType(), 1);
                 }
             } else {
                 setMedia(getTvShows());
@@ -124,12 +137,12 @@ public class TvShowsViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
-        updateMovieAdapter();
+        updateMovieAdapter(tvShows);
     }
 
-    public void getTvShows(String type, String mediaType) {
+    public void getTvShows(String type, String mediaType, int page) {
         AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(mContext);
-        Disposable disposable = new TvFetcher().getTvsList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
+        Disposable disposable = new TvFetcher().getTvsList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, page)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(getMovieListSuccess(), getMovieListFailure());
@@ -165,7 +178,7 @@ public class TvShowsViewModel extends BaseViewModel {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setTvShows(tvShows);
-        updateMovieAdapter();
+        updateMovieAdapter(tvShows);
     }
 
     private void setTvShows(GenericResponse<ArrayList<Tvs>> tvShows) {
@@ -233,9 +246,14 @@ public class TvShowsViewModel extends BaseViewModel {
         mCompositeDisposable = null;
     }
 
-    private void updateMovieAdapter() {
-        if (mMediaCategory != null && mMediaCategory.getTvShows() != null && mMediaCategory.getTvShows().getResults().size() > 0) {
+    private void updateMovieAdapter(GenericResponse<ArrayList<Tvs>> tvShows) {
+        if (tvShows != null && tvShows.getResults() != null && tvShows.getResults().size() > 0) {
             mTvAdapter.addAll(mMediaCategory.getTvShows().getResults());
+            if (tvShows.hasNextPage()) {
+                mTvAdapter.addFooter();
+            } else {
+                mTvAdapter.removeFooter();
+            }
         }
     }
 

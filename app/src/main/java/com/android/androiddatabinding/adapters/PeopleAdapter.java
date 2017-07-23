@@ -54,8 +54,8 @@ public class PeopleAdapter extends BaseAdapter<People> {
     }
 
     @Override
-    protected Object getFooterViewModel(int position) {
-        return new FooterViewModel();
+    protected Object getFooterViewModel(ViewDataBinding viewDataBinding, int position) {
+        return new FooterViewModel(viewDataBinding);
     }
 
     @Override
@@ -65,6 +65,11 @@ public class PeopleAdapter extends BaseAdapter<People> {
 
     @Override
     protected void displayErrorFooter() {
+
+    }
+
+    @Override
+    protected void displayRetryFooter() {
 
     }
 

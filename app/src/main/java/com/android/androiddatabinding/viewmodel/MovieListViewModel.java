@@ -14,8 +14,10 @@ import com.android.androiddatabinding.R;
 import com.android.androiddatabinding.adapters.MoviesAdapter;
 import com.android.androiddatabinding.bus.RxBus;
 import com.android.androiddatabinding.bus.events.Events;
+import com.android.androiddatabinding.common.BaseAdapter;
 import com.android.androiddatabinding.common.BaseViewModel;
 import com.android.androiddatabinding.common.OnItemClickListener;
+import com.android.androiddatabinding.custom.EndlessRecyclerOnScrollListener;
 import com.android.androiddatabinding.data.fetcher.MoviesFetcher;
 import com.android.androiddatabinding.databinding.MovieListLayoutBinding;
 import com.android.androiddatabinding.internal.Constants;
@@ -55,6 +57,7 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
     private MoviesAdapter mMoviesAdapter;
     private MovieListLayoutBinding mMovieListLayoutBinding;
     private int mScrollPosition;
+    private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener;
 
 
     public MovieListViewModel(Context context, MediaCategory mediaCategory,
@@ -72,6 +75,17 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
         getItemList();
         subscribe();
         handelScrollPosition();
+        initPagination();
+    }
+
+    private void initPagination() {
+        mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener((LinearLayoutManager) mMovieListLayoutBinding.movieList.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int current_page) {
+                getMovies(mContext, getQueryType(), getMediaType(), current_page);
+            }
+        };
+        mMovieListLayoutBinding.movieList.addOnScrollListener(mEndlessRecyclerOnScrollListener);
     }
 
     private void initAdapterItemClickListener() {
@@ -107,14 +121,14 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
 
     public void getItemList() {
         if (getMovies() == null) {
-            getMovies(mContext, getQueryType(), getMediaType());
+            getMovies(mContext, getQueryType(), getMediaType(), 1);
         } else {
             if (getMovies() != null && getMovies().getResults().size() == 0) {
                 if (mMediaCategory.getNetworkError() != null) {
-                    showError();
+                    showError(1);
                 } else {
                     Log.d(TAG, getCategoryTitle() + " " + getQueryType());
-                    getMovies(mContext, getQueryType(), getMediaType());
+                    getMovies(mContext, getQueryType(), getMediaType(), 1);
                 }
             } else {
                 setMedia(getMovies());
@@ -123,13 +137,13 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
     }
 
     private void setMedia(GenericResponse<ArrayList<Movie>> movies) {
-        updateData(movies);
+        updateMovieAdapter(movies);
     }
 
 
-    private void getMovies(Context context, String type, String mediaType) {
+    private void getMovies(Context context, String type, String mediaType, final int page) {
         AndroidDataBindingApplication dataBindingApplication = AndroidDataBindingApplication.getApplication(context);
-        Disposable disposable = new MoviesFetcher().getMoviesList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, 1)
+        Disposable disposable = new MoviesFetcher().getMoviesList(dataBindingApplication.getRetrofit(), mediaType, type, Constants.API_KEY, page)
                 .subscribeOn(dataBindingApplication.subscribeScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<GenericResponse<ArrayList<Movie>>>() {
@@ -140,14 +154,14 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        handelGetMoviesErrorCase(throwable);
+                        handelGetMoviesErrorCase(throwable, page);
                     }
                 });
         mCompositeDisposable.add(disposable);
     }
 
 
-    private void handelGetMoviesErrorCase(Throwable throwable) {
+    private void handelGetMoviesErrorCase(Throwable throwable, int page) {
         NetworkError error = new NetworkError();
         if (throwable instanceof HttpException) {
             //we have a HTTP exception (HTTP status code is not 200-300)
@@ -168,7 +182,7 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
             error.setErrorType(NetworkError.TIMEOUT_EXCEPTION);
         }
         mMediaCategory.setNetworkError(error);
-        showError();
+        showError(page);
     }
 
     private void updateMovieList(GenericResponse<ArrayList<Movie>> moviesResponse) {
@@ -177,18 +191,21 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
         }
     }
 
-    private void showError() {
-        errorLabel.set(View.VISIBLE);
-        mediaRecyclerView.set(View.GONE);
-        errorMessageLabel.set(mContext.getString(R.string.error_loading_people));
-        //RxBus.getInstance().send(mMediaCategory);
+    private void showError(int page) {
+        if (page > 1) {
+            mMoviesAdapter.updateFooter(BaseAdapter.FooterType.ERROR);
+        } else {
+            errorLabel.set(View.VISIBLE);
+            mediaRecyclerView.set(View.GONE);
+            errorMessageLabel.set(mContext.getString(R.string.error_loading_people));
+        }
     }
 
     private void updateData(GenericResponse<ArrayList<Movie>> movies) {
         mediaRecyclerView.set(View.VISIBLE);
         errorLabel.set(View.GONE);
         setMovies(movies);
-        updateMovieAdapter(mMediaCategory);
+        updateMovieAdapter(movies);
     }
 
     public void subscribe() {
@@ -229,9 +246,14 @@ public class MovieListViewModel extends BaseViewModel implements OnItemClickList
         }
     }
 
-    private void updateMovieAdapter(MediaCategory mediaCategory) {
-        if (mediaCategory != null && mediaCategory.getMovies() != null && mediaCategory.getMovies().getResults().size() > 0) {
-            mMoviesAdapter.addAll(mediaCategory.getMovies().getResults());
+    private void updateMovieAdapter(GenericResponse<ArrayList<Movie>> mediaCategory) {
+        if (mediaCategory != null && mediaCategory.getResults() != null && mediaCategory.getResults().size() > 0) {
+            mMoviesAdapter.addAll(mediaCategory.getResults());
+            if (mediaCategory.hasNextPage()) {
+                mMoviesAdapter.addFooter();
+            } else {
+                mMoviesAdapter.removeFooter();
+            }
         }
     }
 

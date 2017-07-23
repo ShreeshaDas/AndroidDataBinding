@@ -22,6 +22,7 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     private ArrayList<Movie> mMovies;
     private Context mContext;
+    private FooterViewModel mFooterViewModel;
 
     public MoviesAdapter(Context context, ArrayList<Movie> movies) {
         super(movies);
@@ -55,18 +56,24 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
     }
 
     @Override
-    protected Object getFooterViewModel(int position) {
-        return new FooterViewModel();
+    protected Object getFooterViewModel(ViewDataBinding viewDataBinding, int position) {
+        mFooterViewModel = new FooterViewModel(viewDataBinding);
+        return mFooterViewModel;
     }
 
     @Override
     protected void displayLoadMoreFooter() {
-
+        mFooterViewModel.displayLoadMoreFooter();
     }
 
     @Override
     protected void displayErrorFooter() {
+        mFooterViewModel.displayErrorFooter();
+    }
 
+    @Override
+    protected void displayRetryFooter() {
+        mFooterViewModel.displayRetryFooter();
     }
 
     @Override
@@ -83,7 +90,7 @@ public class MoviesAdapter extends BaseAdapter<Movie> {
 
     @Override
     protected int getVariableForPosition(int position) {
-        return BR.movie;
+        return (isLastPosition(position) && isFooterAdded) ? BR.footer : BR.movie;
     }
 
     @Override
